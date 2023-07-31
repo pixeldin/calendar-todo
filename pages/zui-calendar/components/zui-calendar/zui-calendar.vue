@@ -2,49 +2,55 @@
 	<view>
 		<view class="date-box">
 			<view class="box-list" :style="{'margin-bottom' : list.length > 0 ? '20rpx' : '0'}">
-				<view class="date-top">
-					<view class="icon left-icon" @click="LastYear">
-						<view class="iconfont icon-jiantou_xiangzuoliangci"></view>
-					</view>
+				<view class="date-top" :style="{ display: isOpen ? 'none' : 'block' }">
+					<!-- <view class="icon left-icon" @click="LastYear">
+						<view class="iconfont icon-arrow-left2"></view>
+					</view> -->
 					<view class="conter-text">
 						<view class="icon left-icon" @click="LastMonth">
-							<view class="iconfont icon-xiangzuo1"></view>
+							<view class="iconfont icon-arrow-left"></view>
 						</view>
-						<text class="month">{{year}}年{{month}}月</text>
+						<text class="day-title">{{year}}年{{month}}月{{day}}日</text>
 						<view class="icon rigth-icon" @click="NextMonth">
-							<view class="iconfont icon-xiangyou1"></view>
+							<view class="iconfont icon-arrow-right"></view>
 						</view>
 					</view>
-					<view class="icon rigth-icon" @click="NextYear">
-						<view class="iconfont icon-jiantou_xiangyouliangci"></view>
-					</view>
+					<!-- <view class="icon rigth-icon" @click="NextYear">
+						<view class="iconfont icon-arrow-right2"></view>
+					</view> -->
 				</view>
 				<view class="date-week">
 					<view class="week-item" v-for="item in weekList" :key="item"><text>{{item}}</text></view>
 				</view>
 				<view class="day-content" :style="{height: isOpen ? '100rpx' : 'auto'}" v-if="dayList.length > 0">
-					<view class="day-item day-month" v-if="!isOpen"><text>{{month < 10 ? `0${month}` : month}}</text></view>
+					<!-- 背景月份 -->
+					<!-- <view class="day-item day-month" v-if="!isOpen"><text>{{month < 10 ? `0${month}` : month}}</text></view> -->
 					<view 
 						class="day-item" 
 						v-for="(item, index) in dayList"
 						:key="index"
 						:data-index="index"
 						@click="toActive(item, index)">
-						<text class="day-text" v-if="item.day" :class="{ 'actives' : item.day === day }" >{{item.day ? item.day : ''}}</text>
+						<text class="day-text" v-if="item.day" :class="{ 'actives' : item.day === day }" >{{ item.day < 10 ? '0' + item.day : item.day }}</text>
+						<!-- 签到status true -->
 						<text class="value-text" v-if="item.data.status">{{item.data.value}}</text>
+						<!-- 未签到status false -->
 						<text class="value-text text-red" v-else>{{item.data.value}}</text>
 						<text class="day-dot" v-if="item.data.dot && item.data.active"></text>
 						<text class="day-dot dot-gray" v-if="item.data.dot && !item.data.active"></text>
 					</view>
 				</view>
 				<view style="width: 100%;"  v-if="isShrink">
-					<view class="toggle" v-if="isOpen" @click="toShrinkClose">
-						<view class="iconfont icon-shousuo"></view>
+					<view class="toggle" v-if="isOpen" @click="toStretch">
+						<view class="iconfont icon-stretch"></view>
 					</view>
 					<view class="toggle" v-else @click="toShrink">
-						<view class="iconfont icon-zhankai"></view>
+						<view class="iconfont icon-merge"></view>
 					</view>
 				</view>
+			</view>
+			<view>
+				<!-- <div class="divider"></div> -->
 			</view>
 			<slot name="task">
 			<view class="task-box" v-if="list.length > 0">
@@ -131,13 +137,35 @@
 							// time: '45分钟',
 							details:'点击填写心得',
 							date: '10:30'
+						},
+						{
+							avatar: 'https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/6acec660-4f31-11eb-a16f-5b3e54966275.jpg',
+							title: 'QQ农场',
+							// time: '45分钟',
+							details:'点击填写心得',
+							date: '11:30'
+						},
+						{
+							avatar: 'https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/6acec660-4f31-11eb-a16f-5b3e54966275.jpg',
+							title: '京东抢购',
+							// time: '45分钟',
+							details:'点击填写心得',
+							date: '12:30'
+						},
+						{
+							avatar: 'https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/6acec660-4f31-11eb-a16f-5b3e54966275.jpg',
+							title: '火车票',
+							// time: '45分钟',
+							details:'点击填写心得',
+							date: '11:37'
 						}
 					]
 				}
 			},
 			weekList:{
 				type:Array,
-				default:() => ['日', '一', '二', '三', '四', '五', '六']
+				// default:() => ['日', '一', '二', '三', '四', '五', '六']
+				default:() => ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
 			},
 			date:{
 				type:Object,
@@ -212,7 +240,7 @@
 			},
 			isShrink:{
 				type: Boolean,
-				default: false
+				default: true
 			},
 			isUnfold:{
 				type: Boolean,
@@ -272,11 +300,12 @@
 					}
 				})
 				// console.log(line)
-				console.log(falg)
+				console.log('toShrink======== flag:', falg)
 							this.dayList = dateArr.slice(falg * 7, (falg + 1) * 7)
 				this.isOpen = true
 			},
-			toShrinkClose(){
+			toStretch(){
+				console.log('Stretch')
 				this.dayList = this.getTime(this.year, this.month)
 				this.isOpen = false
 			},
@@ -317,6 +346,7 @@
 			creatDayList(year, month){
 				const count = this.getDayNum(year, month)
 				const week = new Date(year + '/' + month + '/1').getDay()
+				console.log('creatDayList: week======', week)
 				let list = []
 				for(let i = 1; i <= count; i++ ){
 					let data = {};
@@ -331,10 +361,13 @@
 					let obj = {	day:i, data }
 					list.push(obj)
 				}
-				for(let i = 0; i < week; i++){
+				// for(let i = 0; i < week; i++){
+				// 周一开始
+				for(let i = 0; i < week - 1; i++){
 					// list.unshift(this.getDayNum(year, month - 1) -i)
 					list.unshift({ day:null, data:{}})
 				}
+				console.log('creatDayList: ======', list)
 				return list
 			},
 			
@@ -346,13 +379,26 @@
 				return dayNum[month - 1]
 			},
 			
+			// 点击日数方法
+			clickActive(year, month, date, index){
+				console.log('clickActive ====== year/month/date/index', year, month, date, index)
+			},
+			
+			// 点击任务方法
+			clickTask(row, index){
+				console.log('clickTask ======= row/index', row, index)
+			},
+			
 			toActive(item, index){
 				this.day = item.day
-				this.$emit('click-active', {year:this.year, month:this.month, day:item.day, date:this.year + '-' + this.month + '-' +this.day, index: index})
+				// this.$emit('clickActive', {year:this.year, month:this.month, day:item.day, date:this.year + '-' + this.month + '-' +this.day, index: index})
+				this.clickActive(this.year, this.month, item.day, this.year + '-' + this.month + '-' +this.day, index)
 			},
 			
 			toTask(item, index){
-				this.$emit('click-task', {row: item, index: index})
+				console.log('toTask')
+				this.clickTask(item, index)
+				// this.$emit('clickTask', {row: item, index: index})
 			},
 			
 			LastMonth(){
@@ -411,19 +457,27 @@
 
 <style lang="scss" scoped>
 	@import "iconfont.css";
+	/* 取消顶部导航 */
+	.uni-nav {
+		display: none;
+	}
 	.date-box{
 		display: flex;
 		flex-direction: column;
 		flex: 1;
-		padding: 20rpx;
+		// padding: 20rpx;
 		.box-list{
-			background-color: white;
-			border-radius: 20rpx;
+			background-color: #FCEDFA;
+			// border-radius: 20rpx;
 			.date-top{
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-				padding: 40rpx 20rpx;
+				padding: 40rpx 160rpx;
+				// padding-left: auto;
+				// padding-right: auto;
+				// margin-left: auto;
+				// margin-right: auto;
 				.icon{
 					width: 50rpx;
 					height: 50rpx;
@@ -435,12 +489,15 @@
 				}
 				.conter-text{
 					font-size: 32rpx;
-					font-weight: bold;
+					// font-weight: bold;
 					display: flex;
 					flex-direction: row;
 					align-items: center;
 					justify-content: space-between;
-					.month{
+					.day-title{
+						font-weight: bold;
+						// 顶部日期标题
+						color: #b46274;
 						padding: 0 40rpx;
 					}
 				}
@@ -460,7 +517,8 @@
 					height: 52rpx;
 					text-align: center;
 					font-size: 30rpx;
-					color: #909193;
+					// 星期几标识
+					color: #b55370;
 				}
 			}
 			.day-content{
@@ -476,7 +534,7 @@
 					// justify-content: center;
 					align-items: center;
 					width: calc(100%/7);
-					height: 95rpx;
+					height: 70rpx;
 					text-align: center;
 					font-size: 32rpx;
 					z-index: 2;
@@ -489,7 +547,7 @@
 						&.actives{
 							color: #fff;
 							box-sizing: border-box;
-							background-color: #2b85e4;
+							background-color: #b55370;
 							border-radius: 6rpx;
 							border-radius: 50%;
 						}
@@ -508,9 +566,9 @@
 						border-radius: 50%;
 						padding: 6rpx;
 						position: absolute;
-						bottom: 36rpx;
+						bottom: 10rpx;
 						&.dot-gray {
-							background: #18b566;
+							background: #e8e8e8;
 						}
 					}
 				}
@@ -539,7 +597,7 @@
 			.toggle{
 				position: relative;
 				padding: 10rpx 0;
-				margin: 10rpx 20rpx 0;
+				margin: -10rpx 5rpx 0;
 				display: flex;
 				justify-content: center;
 				&:before{
@@ -563,6 +621,12 @@
 					transform: translateY(-50%);
 				}
 			}
+		}
+		// 分割线
+		.divider {
+		    width: 100%;
+		    height: 1px;
+		    background-color: #1467cc;
 		}
 		.task-box{
 			display: flex;
@@ -596,7 +660,7 @@
 						align-content: space-between;
 						.title{
 							font-size: 30rpx;
-							color: #303133;
+							color: #8f9298;
 							margin-bottom: 15rpx;
 						}
 						.date{

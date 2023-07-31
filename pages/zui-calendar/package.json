@@ -1,10 +1,10 @@
 {
-  "id": "zui-calendar",
-  "displayName": "日历展示",
-  "version": "1.1.7",
-  "description": "日历展示",
+  "id": "pxp-calendar",
+  "displayName": "日记事项",
+  "version": "1.0.0",
+  "description": "日记事项",
   "keywords": [
-    "日历，时间，日历任务，时间任务控件，calendar,",
+    "TODO，时间记录，日记任务，时间任务组件，calendar,",
     "date"
 ],
   "repository": "",
@@ -42,7 +42,7 @@
       "client": {
         "Vue": {
           "vue2": "y",
-          "vue3": "u"
+          "vue3": "y"
         },
         "App": {
           "app-vue": "y",

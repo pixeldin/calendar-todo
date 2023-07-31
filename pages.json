@@ -2,9 +2,33 @@
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
 		{
 			// "path": "pages/index/index",
-			"path": "pages/uni_modules/zui-calendar/components/zui-calendar/zui-calendar",
+			"path": "pages/zui-calendar/components/zui-calendar/zui-calendar",
 			"style": {
-				"navigationBarTitleText": "pixel-todo"
+				"navigationStyle": "custom",
+				"onReachBottomDistance": 70,
+				// "navigationBarTitleText": "pixel-todo",
+				"navigationBarBackgroundColor": "#FCEDFA",
+				"app-plus": {
+					"titleNView": false, //禁用原生导航栏
+					"bounce": "none", //关闭窗口回弹效果
+					"titleNView": {
+						"backButton":{
+						  "color":"#ffffff",						  
+						  "fontSize":"32px"
+						}
+					}
+				}
+			}
+		},
+		{
+			"path" : "components/Li-Calendar/Li-Calendar",
+			"style": {
+				"navigationStyle": "custom",
+				"onReachBottomDistance": 50,
+				"app-plus": {
+					"titleNView": false, //禁用原生导航栏
+					"softinputNavBar": "none"
+				}
 			}
 		}
 	],

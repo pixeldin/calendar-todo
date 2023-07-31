@@ -1,0 +1,71 @@
+{
+    "id": "zjy-calendar",
+    "displayName": "zjy-calendar日历，uni-calendar日历增强版",
+    "version": "1.0.0",
+    "description": "zjy-calendar日历是对uniapp uni-calendar日历的增强，支持圆点和文字自定义颜色。",
+    "keywords": [
+        "uni-calendar",
+        "日历增强",
+        "圆点和文字",
+        "自定义",
+        "颜色"
+    ],
+    "repository": "https://github.com/dcloudio/uni-ui",
+    "engines": {
+        "HBuilderX": ""
+    },
+    "directories": {
+        "example": "../../temps/example_temps"
+    },
+    "dcloudext": {
+        "category": [
+            "前端组件",
+            "通用组件"
+        ]
+    },
+    "uni_modules": {
+        "dependencies": [],
+        "encrypt": [],
+        "platforms": {
+            "cloud": {
+                "tcb": "y",
+                "aliyun": "y"
+            },
+            "client": {
+                "App": {
+                    "app-vue": "y",
+                    "app-nvue": "y"
+                },
+                "H5-mobile": {
+                    "Safari": "y",
+                    "Android Browser": "y",
+                    "微信浏览器(Android)": "y",
+                    "QQ浏览器(Android)": "y"
+                },
+                "H5-pc": {
+                    "Chrome": "y",
+                    "IE": "y",
+                    "Edge": "y",
+                    "Firefox": "y",
+                    "Safari": "y"
+                },
+                "小程序": {
+                    "微信": "y",
+                    "阿里": "y",
+                    "百度": "y",
+                    "字节跳动": "y",
+                    "QQ": "y"
+                },
+                "快应用": {
+                    "华为": "u",
+                    "联盟": "u"
+                },
+                "Vue": {
+                    "vue2": "y",
+                    "vue3": "y"
+                }
+            }
+        }
+    },
+    "name": "zjy-calendar日历，uni-calendar日历增强版"
+}
