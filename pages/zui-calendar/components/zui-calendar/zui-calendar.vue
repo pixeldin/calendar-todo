@@ -1,11 +1,17 @@
 <template>
 	<view>
 		<view class="date-box">
+			<view class="top-tools" :style="{ display: isOpen ? 'block' : 'none' }">
+				<text class="brief-title-day">{{ day < 10 ? '0' + day : day }} </text>
+				<view :style="{ 'width': '70px' }">
+					<text class="brief-title">{{year}} {{ month < 10 ? '0' + month : month }} 星期三</text>
+				</view>
+				<view class="down-tip"></view>
+				<view class="select-all"></view>
+			</view>
 			<view class="box-list" :style="{'margin-bottom' : list.length > 0 ? '20rpx' : '0'}">
+				<!-- 收缩隐藏 -->
 				<view class="date-top" :style="{ display: isOpen ? 'none' : 'block' }">
-					<!-- <view class="icon left-icon" @click="LastYear">
-						<view class="iconfont icon-arrow-left2"></view>
-					</view> -->
 					<view class="conter-text">
 						<view class="icon left-icon" @click="LastMonth">
 							<view class="iconfont icon-arrow-left"></view>
@@ -15,9 +21,6 @@
 							<view class="iconfont icon-arrow-right"></view>
 						</view>
 					</view>
-					<!-- <view class="icon rigth-icon" @click="NextYear">
-						<view class="iconfont icon-arrow-right2"></view>
-					</view> -->
 				</view>
 				<view class="date-week">
 					<view class="week-item" v-for="item in weekList" :key="item"><text>{{item}}</text></view>
@@ -25,13 +28,10 @@
 				<view class="day-content" :style="{height: isOpen ? '100rpx' : 'auto'}" v-if="dayList.length > 0">
 					<!-- 背景月份 -->
 					<!-- <view class="day-item day-month" v-if="!isOpen"><text>{{month < 10 ? `0${month}` : month}}</text></view> -->
-					<view 
-						class="day-item" 
-						v-for="(item, index) in dayList"
-						:key="index"
-						:data-index="index"
+					<view class="day-item" v-for="(item, index) in dayList" :key="index" :data-index="index"
 						@click="toActive(item, index)">
-						<text class="day-text" v-if="item.day" :class="{ 'actives' : item.day === day }" >{{ item.day < 10 ? '0' + item.day : item.day }}</text>
+						<text class="day-text" v-if="item.day"
+							:class="{ 'actives' : item.day === day }">{{ item.day < 10 ? '0' + item.day : item.day }}</text>
 						<!-- 签到status true -->
 						<text class="value-text" v-if="item.data.status">{{item.data.value}}</text>
 						<!-- 未签到status false -->
@@ -40,7 +40,7 @@
 						<text class="day-dot dot-gray" v-if="item.data.dot && !item.data.active"></text>
 					</view>
 				</view>
-				<view style="width: 100%;"  v-if="isShrink">
+				<view style="width: 100%;" v-if="isShrink">
 					<view class="toggle" v-if="isOpen" @click="toStretch">
 						<view class="iconfont icon-stretch"></view>
 					</view>
@@ -51,22 +51,25 @@
 			</view>
 			<view>
 				<!-- <div class="divider"></div> -->
+				<!-- 胶囊tab切换 -->
+				<TabSwitch :ddList="ddList"/>
 			</view>
 			<slot name="task">
-			<view class="task-box" v-if="list.length > 0">
-				<view class="task-item" v-for="(item, index) in list" :key="index" @click="toTask(item, index)">
-					<view class="avatar-box">
-						<view class="avatar">
-							 <image :src="item.avatar"></image>
+				<view class="task-box" v-if="list.length > 0">
+					<view class="task-item" v-for="(item, index) in list" :key="index" @click="toTask(item, index)">
+						<view class="avatar-box">
+							<view class="avatar">
+								<image :src="item.avatar"></image>
+							</view>
+							<view class="title-box">
+								<view class="title"><text>{{item.title}}</text></view>
+								<view class="date"><text
+										class="branch">时间：{{item.time}}</text><text>{{item.details}}</text></view>
+							</view>
 						</view>
-						<view class="title-box">
-							<view class="title"><text>{{item.title}}</text></view>
-							<view class="date"><text class="branch">时间：{{item.time}}</text><text>{{item.details}}</text></view>
-						</view>
+						<view class="time"><text>{{item.date}}</text></view>
 					</view>
-					<view class="time"><text>{{item.date}}</text></view>
 				</view>
-			</view>
 			</slot>
 		</view>
 		<view class="modal" v-if="show">
@@ -74,8 +77,12 @@
 			<view class="z-content">
 				<view class="modal-content">
 					<view class="z-modal" :style="{width: width}">
-						<view class="modal-title"><slot name="title"><text>{{title}}</text></slot></view>
-						<view class="z-modal-content"><slot name="content"><text>{{content}}</text></slot></view>
+						<view class="modal-title">
+							<slot name="title"><text>{{title}}</text></slot>
+						</view>
+						<view class="z-modal-content">
+							<slot name="content"><text>{{content}}</text></slot>
+						</view>
 						<view class="line"></view>
 						<view class="modal-foot">
 							<slot name="footer">
@@ -96,80 +103,80 @@
 </template>
 
 <script>
+	import TabSwitch from '@/pages/zui-calendar/components/zui-calendar/TabSwitch/TabSwitch.vue';
 	export default {
-		name: 'zyfDate',
-		props:{
-			list:{
+		name: 'pxpDate',
+		props: {
+			list: {
 				type: Array,
 				default: () => {
-					return [
-						{
+					return [{
 							avatar: 'https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/6acec660-4f31-11eb-a16f-5b3e54966275.jpg',
 							title: '英语词汇',
 							time: '38分钟',
-							details:'点击填写心得',
+							details: '点击填写心得',
 							date: '10:30'
 						},
 						{
 							avatar: 'https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/6acec660-4f31-11eb-a16f-5b3e54966275.jpg',
 							title: '英语词汇',
 							time: '37分钟',
-							details:'点击填写心得',
+							details: '点击填写心得',
 							date: '10:30'
 						},
 						{
 							avatar: '',
 							title: 'WPS签到',
 							// time: '45分钟',
-							details:'点击填写心得',
+							details: '点击填写心得',
 							date: '10:30'
 						},
-						{
-							avatar: 'https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/6acec660-4f31-11eb-a16f-5b3e54966275.jpg',
-							title: '淘宝农场',
-							// time: '45分钟',
-							details:'点击填写心得',
-							date: '10:30'
-						},
-						{
-							avatar: 'https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/6acec660-4f31-11eb-a16f-5b3e54966275.jpg',
-							title: '英语语法',
-							// time: '45分钟',
-							details:'点击填写心得',
-							date: '10:30'
-						},
-						{
-							avatar: 'https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/6acec660-4f31-11eb-a16f-5b3e54966275.jpg',
-							title: 'QQ农场',
-							// time: '45分钟',
-							details:'点击填写心得',
-							date: '11:30'
-						},
-						{
-							avatar: 'https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/6acec660-4f31-11eb-a16f-5b3e54966275.jpg',
-							title: '京东抢购',
-							// time: '45分钟',
-							details:'点击填写心得',
-							date: '12:30'
-						},
+						// {
+						// 	avatar: 'https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/6acec660-4f31-11eb-a16f-5b3e54966275.jpg',
+						// 	title: '淘宝农场',
+						// 	// time: '45分钟',
+						// 	details:'点击填写心得',
+						// 	date: '10:30'
+						// },
+						// {
+						// 	avatar: 'https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/6acec660-4f31-11eb-a16f-5b3e54966275.jpg',
+						// 	title: '英语语法',
+						// 	// time: '45分钟',
+						// 	details:'点击填写心得',
+						// 	date: '10:30'
+						// },
+						// {
+						// 	avatar: 'https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/6acec660-4f31-11eb-a16f-5b3e54966275.jpg',
+						// 	title: 'QQ农场',
+						// 	// time: '45分钟',
+						// 	details:'点击填写心得',
+						// 	date: '11:30'
+						// },
+						// {
+						// 	avatar: 'https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/6acec660-4f31-11eb-a16f-5b3e54966275.jpg',
+						// 	title: '京东抢购',
+						// 	// time: '45分钟',
+						// 	details:'点击填写心得',
+						// 	date: '12:30'
+						// },
 						{
 							avatar: 'https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/6acec660-4f31-11eb-a16f-5b3e54966275.jpg',
 							title: '火车票',
 							// time: '45分钟',
-							details:'点击填写心得',
+							details: '点击填写心得',
 							date: '11:37'
 						}
 					]
 				}
 			},
-			weekList:{
-				type:Array,
+			weekList: {
+				type: Array,
 				// default:() => ['日', '一', '二', '三', '四', '五', '六']
-				default:() => ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+				default: () => ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
 			},
-			date:{
-				type:Object,
-				default:() => {
+			date: {
+				type: Object,
+				default: () => {
 					return {
 						year: new Date().getFullYear(),
 						month: parseInt(new Date().getMonth() + 1),
@@ -179,96 +186,120 @@
 			},
 			extraData: {
 				type: Array,
-				default: ()=> {
-					return [{date: '2023-7-28', value: '签到', status: true, dot: true, active: false},{date: '2023-7-29', value: '未签到', status: false, dot: true, active: true},{date: '2023-7-30', value: '未打卡', status: false, dot: true, active: false}] // {date: '2020-6-3', value: '签到', dot: true, active: true}
+				default: () => {
+					return [{
+						date: '2023-7-28',
+						value: '签到',
+						status: true,
+						dot: true,
+						active: false
+					}, {
+						date: '2023-7-29',
+						value: '未签到',
+						status: false,
+						dot: true,
+						active: true
+					}, {
+						date: '2023-7-30',
+						value: '未打卡',
+						status: false,
+						dot: true,
+						active: false
+					}] // {date: '2020-6-3', value: '签到', dot: true, active: true}
 				}
 			},
 
-			show:{
+			show: {
 				type: Boolean,
 				default: false
 			},
-			
-			title:{
+
+			title: {
 				type: String,
 				default: ''
 			},
-			
-			content:{
+
+			content: {
 				type: String,
 				default: '--'
 			},
-			
-			confirmText:{
+
+			confirmText: {
 				type: String,
 				default: '确认'
 			},
-			
-			cancelText:{
+
+			cancelText: {
 				type: String,
 				default: '取消'
 			},
-			
-			showConfirmButton:{
+
+			showConfirmButton: {
 				type: Boolean,
 				default: true
 			},
-			
-			showCancelButton:{
+
+			showCancelButton: {
 				type: Boolean,
 				default: false
 			},
-			
-			confirmColor:{
+
+			confirmColor: {
 				type: String,
 				default: '#2979ff'
 			},
-			
-			cancelColor:{
+
+			cancelColor: {
 				type: String,
 				default: '#606266'
 			},
-			
-			closeOnClickOverlay:{
+
+			closeOnClickOverlay: {
 				type: Boolean,
 				default: true
 			},
-			
-			width:{
-				type: [Number,String],
+
+			width: {
+				type: [Number, String],
 				default: '650rpx'
 			},
-			isShrink:{
+			isShrink: {
 				type: Boolean,
 				default: true
 			},
-			isUnfold:{
+			isUnfold: {
 				type: Boolean,
 				default: false
 			}
 		},
 		data() {
 			return {
-				dayList:[],
+				dayList: [],
 				year: 2022,
 				month: 10,
 				day: 10,
 				isOpen: false,
+				ddList: ['一', '2', '3', 'THU', 'FRI', 'SAT', '日'],
 			}
 		},
-		onLoad() {
-			
+		components: {
+			TabSwitch
 		},
+		onLoad() {},
 		created() {
 			this.isOpen = this.isUnfold
-			const { year, month, day  } = this.date
+			const {
+				year,
+				month,
+				day
+			} = this.date
 			this.year = year
 			this.month = month
 			this.day = day
 			this.initTime()
 			this.initApi(this.year, this.month)
 		},
-		onNavigationBarButtonTap(e){
+		onNavigationBarButtonTap(e) {
 			console.log(e)
 			uni.showToast({
 				title: '分享',
@@ -276,133 +307,149 @@
 			});
 		},
 		methods: {
-			initTime(){
-				const { year, month, day } = this.getTiemNowDate()
+			initTime() {
+				const {
+					year,
+					month,
+					day
+				} = this.getTiemNowDate()
 				this.year = year
 				this.month = month
 				this.day = day
 				//console.log('今日时间为：' + this.year + '-' + this.month + '-' +this.day )
 			},
-			toShrink(){
+			toShrink() {
 				let falg = null
 				// console.log(this.year)
 				// console.log(this.month)
 				// console.log(this.day)
 				const dateArr = this.getTime(this.year, this.month);
 				// console.log(dateArr)
-				const line = dateArr.map((item,index) => {
-					
+				const line = dateArr.map((item, index) => {
+
 					// console.log(item.day)
-					if(this.day == item.day){
+					if (this.day == item.day) {
 						console.log(index)
-						falg = Math.floor(index/7)
-						return Math.floor(index/7)
+						falg = Math.floor(index / 7)
+						return Math.floor(index / 7)
 					}
 				})
 				// console.log(line)
 				console.log('toShrink======== flag:', falg)
-							this.dayList = dateArr.slice(falg * 7, (falg + 1) * 7)
+				this.dayList = dateArr.slice(falg * 7, (falg + 1) * 7)
 				this.isOpen = true
 			},
-			toStretch(){
+			toStretch() {
 				console.log('Stretch')
 				this.dayList = this.getTime(this.year, this.month)
 				this.isOpen = false
 			},
-			getTiemNowDate(){
-				var date 	= new Date()
-				var year 	= date.getFullYear()
+			getTiemNowDate() {
+				var date = new Date()
+				var year = date.getFullYear()
 				var month = parseInt(date.getMonth() + 1)
-				var day 	= date.getDate()
-				if(month < 10){
+				var day = date.getDate()
+				if (month < 10) {
 					month = '0' + month
 				}
-				
-				if(day < 10){
+
+				if (day < 10) {
 					day = '0' + day
 				}
-				
+
 				const resultDate = {
-					year:year,
+					year: year,
 					month: parseInt(month),
-					day:parseInt(day)
+					day: parseInt(day)
 				}
-				
+
 				return resultDate
 			},
-			
+
 			initApi(year, month) {
-				if(this.isShrink && this.isOpen){
+				if (this.isShrink && this.isOpen) {
 					this.toShrink()
 				} else {
-					
+
 					this.dayList = this.getTime(year, month)
 				}
 			},
-			getTime(year, month){
-				
+			getTime(year, month) {
+
 				return this.creatDayList(year, month)
 			},
-			creatDayList(year, month){
+			creatDayList(year, month) {
 				const count = this.getDayNum(year, month)
 				const week = new Date(year + '/' + month + '/1').getDay()
 				console.log('creatDayList: week======', week)
 				let list = []
-				for(let i = 1; i <= count; i++ ){
+				for (let i = 1; i <= count; i++) {
 					let data = {};
-					for(let item of this.extraData){
+					for (let item of this.extraData) {
 						let dateString = item.date;
-						let dateArr = dateString.indexOf('-') !== -1 ? dateString.split('-') : dateString.indexOf('/') !== -1 ? dateString.split('/') :  [];
-						if(dateArr.length === 3 && Number(dateArr[0]) === Number(this.year) && Number(dateArr[1]) === Number(this.month) && Number(dateArr[2]) === Number(i)){
+						let dateArr = dateString.indexOf('-') !== -1 ? dateString.split('-') : dateString.indexOf('/') !==
+							-1 ? dateString.split('/') : [];
+						if (dateArr.length === 3 && Number(dateArr[0]) === Number(this.year) && Number(dateArr[1]) ===
+							Number(this.month) && Number(dateArr[2]) === Number(i)) {
 							data = item
 						}
 					}
-					
-					let obj = {	day:i, data }
+
+					let obj = {
+						day: i,
+						data
+					}
 					list.push(obj)
 				}
 				// for(let i = 0; i < week; i++){
 				// 周一开始
-				for(let i = 0; i < week - 1; i++){
+				for (let i = 0; i < week - 1; i++) {
 					// list.unshift(this.getDayNum(year, month - 1) -i)
-					list.unshift({ day:null, data:{}})
+					list.unshift({
+						day: null,
+						data: {}
+					})
 				}
 				console.log('creatDayList: ======', list)
 				return list
 			},
-			
-			getDayNum(year, month){
+
+			getDayNum(year, month) {
 				let dayNum = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-				if((year % 4 !== 0) && (year % 100 === 0) || (year % 400 !== 0)){
+				if ((year % 4 !== 0) && (year % 100 === 0) || (year % 400 !== 0)) {
 					dayNum[1] = 28
 				}
 				return dayNum[month - 1]
 			},
-			
+
 			// 点击日数方法
-			clickActive(year, month, date, index){
+			clickActive(year, month, date, index) {
 				console.log('clickActive ====== year/month/date/index', year, month, date, index)
+				this.ddList.splice(1, 1, '周二');
+				this.ddList.splice(3, 1, '周四');
 			},
-			
+
 			// 点击任务方法
-			clickTask(row, index){
+			clickTask(row, index) {
 				console.log('clickTask ======= row/index', row, index)
+				this.ddList.splice(1, 1, 'Two');
+				this.ddList.splice(3, 1, 'Thursday');
 			},
-			
-			toActive(item, index){
+
+			toActive(item, index) {
 				this.day = item.day
 				// this.$emit('clickActive', {year:this.year, month:this.month, day:item.day, date:this.year + '-' + this.month + '-' +this.day, index: index})
-				this.clickActive(this.year, this.month, item.day, this.year + '-' + this.month + '-' +this.day, index)
+				this.clickActive(this.year, this.month, item.day, this.year + '-' + this.month + '-' + this.day, index)
 			},
-			
-			toTask(item, index){
+
+			toTask(item, index) {
 				console.log('toTask')
 				this.clickTask(item, index)
 				// this.$emit('clickTask', {row: item, index: index})
 			},
-			
-			LastMonth(){
-				if(this.month > 1){
+
+			LastMonth() {
+				if (this.month > 1) {
 					this.month = this.month - 1
 					this.initApi(this.year, this.month)
 				} else {
@@ -410,106 +457,190 @@
 					this.month = 12
 					this.initApi(this.year, this.month)
 				}
-				this.$emit('last-month', {year: this.year, month:this.month})
+				this.$emit('last-month', {
+					year: this.year,
+					month: this.month
+				})
 			},
-			
-			NextMonth(){
-				if(this.month < 12){
+
+			NextMonth() {
+				if (this.month < 12) {
 					this.month = this.month + 1
 				} else {
 					this.NextYear(false)
 					this.month = 1
 				}
 				this.initApi(this.year, this.month)
-				this.$emit('next-month', {year: this.year, month:this.month})
+				this.$emit('next-month', {
+					year: this.year,
+					month: this.month
+				})
 			},
-			
-			LastYear(flag = true){
-				if(this.year > 2000){
+
+			LastYear(flag = true) {
+				if (this.year > 2000) {
 					this.year = this.year - 1
-					if(flag){
+					if (flag) {
 						this.initApi(this.year, this.month)
 					}
-					this.$emit('last-year', {year: this.year, month:this.month, day:this.day})
+					this.$emit('last-year', {
+						year: this.year,
+						month: this.month,
+						day: this.day
+					})
 				}
 			},
-			
-			NextYear(flag = true){
+
+			NextYear(flag = true) {
 				this.year = this.year + 1
 				this.initApi(this.year, this.month)
-				this.$emit('next-year', {year: this.year, month:this.month, day:this.day})
+				this.$emit('next-year', {
+					year: this.year,
+					month: this.month,
+					day: this.day
+				})
 			},
-			
-			confirm(){
+
+			confirm() {
 				this.$emit('confirm')
 			},
-			
-			cancel(){
+
+			cancel() {
 				this.$emit('cancel')
 			},
-			
-			close(){
+
+			close() {
 				this.$emit('close')
 			}
 		}
 	}
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 	@import "iconfont.css";
+	@import url("./cal.css");
+
 	/* 取消顶部导航 */
 	.uni-nav {
 		display: none;
 	}
-	.date-box{
+
+	.date-box {
 		display: flex;
 		flex-direction: column;
 		flex: 1;
-		// padding: 20rpx;
-		.box-list{
+		/* padding: 20rpx; */
+
+		.top-tools {
+			width: 100%;
+			height: 80rpx;
+			color: #b46274;
+			/* background-color: #1467cc; */
 			background-color: #FCEDFA;
-			// border-radius: 20rpx;
-			.date-top{
+			padding: 10rpx 20rpx;
+			position: relative;
+		}
+
+		/* 顶部概要日期-天 */
+		.brief-title-day {
+			font-weight: bold;
+			font-size: 52rpx;
+			color: #b4416f;
+			position: relative;
+			padding: 0 3rpx;
+		}
+
+		/* 顶部概要日期-年份/月/星期 */
+		.brief-title {
+			/* // font-weight: bold; */
+			width: 14%;
+			font-size: 26rpx;
+			/* // background-color: #8bcc40; */
+			background-color: #FCEDFA;
+			word-wrap: break-word;
+			/* 顶部日期标题 */
+			color: #b46274;
+			position: absolute;
+			top: 19%;
+			left: 14%;
+			/* // padding: 0 0rpx; */
+		}
+
+		.down-tip {
+			background-image: url('../../static/icon/down-tip.png');
+			background-size: contain;
+			background-repeat: no-repeat;
+			width: 10px;
+			height: 10px;
+			position: absolute;
+			top: 48.4%;
+			left: 31%;
+		}
+
+		.select-all {
+			background-image: url('../../static/icon/check-all-dark.png');
+			background-size: contain;
+			background-repeat: no-repeat;
+			width: 24px;
+			height: 24px;
+			position: absolute;
+			top: 26.4%;
+			left: 85.4%;
+			/* // color: #a3b432; */
+			/* // background-color: #18b566; */
+		}
+
+		.box-list {
+			background-color: #FCEDFA;
+
+			/* border-radius: 20rpx; */
+			.date-top {
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-				padding: 40rpx 160rpx;
-				// padding-left: auto;
-				// padding-right: auto;
-				// margin-left: auto;
-				// margin-right: auto;
-				.icon{
+				padding: 40rpx 150rpx;
+
+				/* padding-left: auto; */
+				/* padding-right: auto; */
+				/* margin-left: auto; */
+				/* margin-right: auto; */
+				.icon {
 					width: 50rpx;
 					height: 50rpx;
 					line-height: 50rpx;
+
 					image {
 						width: 50rpx;
 						height: 50rpx;
 					}
 				}
-				.conter-text{
+
+				.conter-text {
 					font-size: 32rpx;
-					// font-weight: bold;
+					/* font-weight: bold; */
 					display: flex;
 					flex-direction: row;
 					align-items: center;
 					justify-content: space-between;
-					.day-title{
+
+					.day-title {
 						font-weight: bold;
-						// 顶部日期标题
+						/* 顶部日期标题 */
 						color: #b46274;
-						padding: 0 40rpx;
+						padding: 0 0rpx;
 					}
 				}
 			}
-			.date-week{
+
+			.date-week {
 				display: flex;
 				align-items: center;
 				justify-content: space-between;
 				flex: 1;
 				padding: 20rpx;
 				border-bottom: 1rpx solid #f3f4f6;
-				.week-item{
+
+				.week-item {
 					display: flex;
 					justify-content: center;
 					align-items: center;
@@ -517,21 +648,23 @@
 					height: 52rpx;
 					text-align: center;
 					font-size: 30rpx;
-					// 星期几标识
+					/* 星期几标识 */
 					color: #b55370;
 				}
 			}
-			.day-content{
+
+			.day-content {
 				display: flex;
 				flex-direction: row;
 				flex-wrap: wrap;
 				align-items: center;
 				padding: 10rpx 20rpx;
 				position: relative;
-				.day-item{
+
+				.day-item {
 					display: flex;
 					flex-direction: column;
-					// justify-content: center;
+					/* justify-content: center; */
 					align-items: center;
 					width: calc(100%/7);
 					height: 70rpx;
@@ -539,40 +672,47 @@
 					font-size: 32rpx;
 					z-index: 2;
 					position: relative;
-					.day-text{
+
+					.day-text {
 						width: 65rpx;
 						height: 65rpx;
 						line-height: 65rpx;
-						// margin-bottom: 5rpx;
-						&.actives{
+
+						/* margin-bottom: 5rpx; */
+						&.actives {
 							color: #fff;
 							box-sizing: border-box;
-							background-color: #b55370;
+							background-color: #C37F8F;
 							border-radius: 6rpx;
 							border-radius: 50%;
 						}
 					}
-					.value-text{
+
+					.value-text {
 						font-size: 24rpx;
 						color: #18b566;
-						// 未完成样式
+
+						/* 未完成样式 */
 						&.text-red {
 							color: #dd6161;
 						}
 					}
-					.day-dot{
+
+					.day-dot {
 						margin-top: 5rpx;
 						background: #dd6161;
 						border-radius: 50%;
 						padding: 6rpx;
 						position: absolute;
 						bottom: 10rpx;
+
 						&.dot-gray {
 							background: #e8e8e8;
 						}
 					}
 				}
-				.day-month{
+
+				.day-month {
 					position: absolute;
 					top: 0;
 					bottom: 0;
@@ -584,7 +724,7 @@
 					align-items: center;
 					width: 100%;
 					height: 100%;
-					// color: rgba(231,232,234,.83);
+					/* color: rgba(231,232,234,.83); */
 					font-size: 200px;
 					font-weight: 700;
 					color: #999;
@@ -594,13 +734,15 @@
 					z-index: 1;
 				}
 			}
-			.toggle{
+
+			.toggle {
 				position: relative;
 				padding: 10rpx 0;
 				margin: -10rpx 5rpx 0;
 				display: flex;
 				justify-content: center;
-				&:before{
+
+				&:before {
 					width: calc(50% - 30rpx);
 					border-top: solid 1px #EAEAEA;
 					content: '';
@@ -610,7 +752,8 @@
 					left: 0;
 					transform: translateY(-50%);
 				}
-				&:after{
+
+				&:after {
 					width: calc(50% - 30rpx);
 					border-top: solid 1px #EAEAEA;
 					content: '';
@@ -622,16 +765,12 @@
 				}
 			}
 		}
-		// 分割线
-		.divider {
-		    width: 100%;
-		    height: 1px;
-		    background-color: #1467cc;
-		}
-		.task-box{
+
+		.task-box {
 			display: flex;
 			flex-direction: column;
-			.task-item{
+
+			.task-item {
 				display: flex;
 				flex-direction: row;
 				align-items: center;
@@ -641,32 +780,39 @@
 				box-sizing: border-box;
 				border-radius: 10rpx;
 				margin-bottom: 20rpx;
-				.avatar-box{
+
+				.avatar-box {
 					display: flex;
-					.avatar{
+
+					.avatar {
 						width: 100rpx;
 						height: 100rpx;
 						margin-right: 20rpx;
 						border-radius: 50%;
-						image{
+
+						image {
 							width: 100rpx;
 							height: 100rpx;
 							border-radius: 50%;
 						}
 					}
-					.title-box{
+
+					.title-box {
 						display: flex;
 						flex-direction: column;
 						align-content: space-between;
-						.title{
+
+						.title {
 							font-size: 30rpx;
 							color: #8f9298;
 							margin-bottom: 15rpx;
 						}
-						.date{
+
+						.date {
 							font-size: 26rpx;
 							color: #909193;
-							.branch{
+
+							.branch {
 								margin-right: 15rpx;
 							}
 						}
@@ -675,11 +821,13 @@
 			}
 		}
 	}
-	.modal{
+
+	.modal {
 		display: flex;
 		flex-direction: column;
 		flex: 1;
-		.mask{
+
+		.mask {
 			transition-duration: 450ms;
 			transition-timing-function: ease-out;
 			position: fixed;
@@ -687,32 +835,37 @@
 			z-index: 10070;
 			background-color: rgba(0, 0, 0, 0.5);
 		}
-		.z-content{
+
+		.z-content {
 			z-index: 10075;
 			position: fixed;
 			display: flex;
 			align-items: center;
 			justify-content: center;
 			inset: 0px;
-			.modal-content{
+
+			.modal-content {
 				border-radius: 6px;
 				overflow: hidden;
 				margin-top: 0px;
-				// height: 200px;
+				/* height: 200px; */
 				background-color: #fff;
 				position: relative;
-				.z-modal{
+
+				.z-modal {
 					width: 289px;
 					border-radius: 6px;
 					overflow: hidden;
-					.modal-title{
+
+					.modal-title {
 						font-size: 16px;
 						font-weight: 700;
 						color: #606266;
 						text-align: center;
 						padding-top: 25px;
 					}
-					.z-modal-content{
+
+					.z-modal-content {
 						padding: 12px 25px 25px 25px;
 						display: flex;
 						flex-direction: row;
@@ -720,7 +873,8 @@
 						font-size: 15px;
 						color: #606266;
 					}
-					.line{
+
+					.line {
 						margin: 0px;
 						border-bottom: 1px solid rgb(214, 215, 217);
 						width: 100%;
@@ -730,13 +884,15 @@
 						border-left-color: rgb(214, 215, 217);
 						vertical-align: middle;
 					}
-					.modal-foot{
+
+					.modal-foot {
 						display: flex;
 						flex-direction: row;
 						font-size: 16px;
 						text-align: center;
 						color: rgb(96, 98, 102);
-						.cancel{
+
+						.cancel {
 							flex: 1;
 							display: flex;
 							flex-direction: row;
@@ -744,7 +900,8 @@
 							align-items: center;
 							height: 48px;
 						}
-						.foot-line{
+
+						.foot-line {
 							margin: 0px;
 							border-left: 1px solid rgb(214, 215, 217);
 							height: 48px;
@@ -753,20 +910,22 @@
 							border-right-color: rgb(214, 215, 217);
 							border-bottom-color: rgb(214, 215, 217);
 						}
-						.confirm{
+
+						.confirm {
 							flex: 1;
 							display: flex;
 							flex-direction: row;
 							justify-content: center;
 							align-items: center;
 							height: 48px;
-							text{
+
+							text {
 								color: rgb(41, 121, 255);
 							}
 						}
 					}
 				}
-				
+
 			}
 		}
 	}

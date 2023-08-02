@@ -19,19 +19,17 @@
 					}
 				}
 			}
-		},
-		{
-			"path" : "components/Li-Calendar/Li-Calendar",
-			"style": {
-				"navigationStyle": "custom",
-				"onReachBottomDistance": 50,
-				"app-plus": {
-					"titleNView": false, //禁用原生导航栏
-					"softinputNavBar": "none"
-				}
-			}
 		}
-	],
+	    ,{
+            "path" : "pages/zui-calendar/components/zui-calendar/TabSwitch/TabSwitch",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+    ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "uni-app",
