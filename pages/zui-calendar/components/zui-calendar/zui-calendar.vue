@@ -2,14 +2,16 @@
 	<view>
 		<view class="date-box">
 			<view class="top-tools" :style="{ display: isOpen ? 'block' : 'none' }">
-				<text class="brief-title-day">{{ typeof day !== 'number' || isNaN(day) ? day : (day < 10 ? '0' + day : day) }} </text>
+				<text
+					class="brief-title-day">{{ typeof day !== 'number' || isNaN(day) ? day : (day < 10 ? '0' + day : day) }}
+				</text>
 				<view :style="{ 'width': '70px' }">
-					<text class="brief-title">{{year}} {{ month < 10 ? '0' + month : month }} 星期X</text>
+					<text class="brief-title">{{year}} {{ month < 10 ? '0' + month : month }} 星期{{TWeek}}</text>
 				</view>
 				<view class="down-tip"></view>
 				<view class="select-all"></view>
 			</view>
-			<view class="box-list" :style="{'margin-bottom' : list.length > 0 ? '20rpx' : '0'}">
+			<view class="box-list" :style="{'margin-bottom' : tasklist.length > 0 ? '20rpx' : '0'}">
 				<!-- 收缩隐藏 -->
 				<view class="date-top" :style="{ display: isOpen ? 'none' : 'block' }">
 					<view class="conter-text">
@@ -25,7 +27,7 @@
 				<!-- 收缩高亮当前周目 -->
 				<view :style="{ display: isOpen ? 'block' : 'none' }">
 					<!-- 高亮框 -->
-					<view class="week-container">						
+					<view class="week-container">
 						<view v-for="item in weekList" :key="item" class="week-item-h"></view>
 					</view>
 					<!-- <view v-for="item in weekList" :key="item"> -->
@@ -42,7 +44,9 @@
 					<view class="day-item" v-for="(item, index) in dayList" :key="index" :data-index="index"
 						@click="toActive(item, index)">
 						<text class="day-text" v-if="item.day"
-							:class="{ 'actives' : item.day === day }">{{ item.day < 10 ? '0' + item.day : item.day }}</text>
+							:class="{ 'cTodayActive': item.day === day && item.today, 'actives': item.day === day, 'cToday': item.today }">
+							{{ item.today ? '今' : (item.day < 10 ? '0' + item.day : item.day) }}
+						</text>
 						<!-- 签到status true -->
 						<text class="value-text" v-if="item.data.status">{{item.data.value}}</text>
 						<!-- 未签到status false -->
@@ -66,8 +70,8 @@
 				<TabSwitch :ddList="ddList" />
 			</view>
 			<slot name="task">
-				<view class="task-box" v-if="list.length > 0">
-					<view class="task-item" v-for="(item, index) in list" :key="index" @click="toTask(item, index)">
+				<view class="task-box" v-if="tasklist.length > 0">
+					<view class="task-item" v-for="(item, index) in tasklist" :key="index" @click="toTask(item, index)">
 						<view class="avatar-box">
 							<view class="avatar">
 								<image :src="item.avatar"></image>
@@ -118,7 +122,7 @@
 	export default {
 		name: 'pxpDate',
 		props: {
-			list: {
+			tasklist: {
 				type: Array,
 				default: () => {
 					return [{
@@ -199,19 +203,19 @@
 				type: Array,
 				default: () => {
 					return [{
-						date: '2023-7-28',
+						date: '2023-8-2',
 						value: '签到',
 						status: true,
 						dot: true,
-						active: false
+						active: true
 					}, {
-						date: '2023-7-29',
+						date: '2023-8-3',
 						value: '未签到',
 						status: false,
 						dot: true,
 						active: true
 					}, {
-						date: '2023-7-30',
+						date: '2023-8-4',
 						value: '未打卡',
 						status: false,
 						dot: true,
@@ -286,9 +290,14 @@
 		data() {
 			return {
 				dayList: [],
-				year: 2022,
-				month: 10,
-				day: 10,
+				year: 2023,
+				month: 8,
+				day: 1,
+				// today
+				Tyear: 2023,
+				Tmonth: 8,
+				Tday: 1,
+				TWeek: "日",
 				isOpen: false,
 				ddList: ['一', '2', '3', 'THU', 'FRI', 'SAT', '日'],
 			}
@@ -327,7 +336,11 @@
 				this.year = year
 				this.month = month
 				this.day = day
-				//console.log('今日时间为：' + this.year + '-' + this.month + '-' +this.day )
+				this.Tyear = year
+				this.Tmonth = month
+				this.Tday = day
+				this.TWeek = this.getDayOfWeek(this.Tyear, this.Tmonth, this.Tday)
+				console.log('initTime今日时间为：' + this.Tyear + '-' + this.Tmonth + '-' + this.Tday)
 			},
 			toShrink() {
 				let falg = null
@@ -340,7 +353,8 @@
 
 					// console.log(item.day)
 					if (this.day == item.day) {
-						console.log(index)
+						console.log('toShrink 聚焦天=======index/day', index, item.day)
+						this.TWeek = this.getDayOfWeek(this.year, this.month, item.day)
 						falg = Math.floor(index / 7)
 						return Math.floor(index / 7)
 					}
@@ -349,11 +363,24 @@
 				console.log('toShrink======== flag:', falg)
 				this.dayList = dateArr.slice(falg * 7, (falg + 1) * 7)
 				this.isOpen = true
+				// 修改粉色
+				this.changeDayItemColor('#ac7984', 'normal')
+			},
+			// 改变日历天颜色
+			changeDayItemColor(color, fontW) {
+				console.log('changeDayItemColor ---------')
+				const dayItems = document.querySelectorAll('.day-content .day-item')
+				for (let i = 0; i < dayItems.length; i++) {
+					dayItems[i].style.color = color
+					dayItems[i].style.fontWeight = fontW
+				}
 			},
 			toStretch() {
-				console.log('Stretch')
+				console.log('收缩Stretch')
 				this.dayList = this.getTime(this.year, this.month)
 				this.isOpen = false
+				// 修改黑色
+				this.changeDayItemColor('#110c0d', 'bold')
 			},
 			getTiemNowDate() {
 				var date = new Date()
@@ -381,18 +408,21 @@
 				if (this.isShrink && this.isOpen) {
 					this.toShrink()
 				} else {
-
 					this.dayList = this.getTime(year, month)
 				}
 			},
 			getTime(year, month) {
-
-				return this.creatDayList(year, month)
+				return this.createDayList(year, month)
 			},
-			creatDayList(year, month) {
+			createDayList(year, month) {
+				console.log("Pxp createDayList###################, year/month", year, month)
+				let tflag = false
+				if (year === this.Tyear && month === this.Tmonth) {
+					tflag = true
+				}
 				const count = this.getDayNum(year, month)
 				const week = new Date(year + '/' + month + '/1').getDay()
-				console.log('creatDayList: week======', week)
+				console.log('createDayList: week======', week)
 				let list = []
 				for (let i = 1; i <= count; i++) {
 					let data = {};
@@ -405,10 +435,14 @@
 							data = item
 						}
 					}
-
 					let obj = {
 						day: i,
+						today: false,
 						data
+					}
+					if (tflag && i === this.Tday) {
+						// console.log("Pxp reset Today!")
+						obj.today = true;
 					}
 					list.push(obj)
 				}
@@ -421,7 +455,7 @@
 						data: {}
 					})
 				}
-				console.log('creatDayList: ======', list)
+				console.log('createDayList: ======', list)
 				return list
 			},
 
@@ -433,11 +467,23 @@
 				return dayNum[month - 1]
 			},
 
+			// 根据日期获取周几
+			getDayOfWeek(year, month, day) {
+				const date = new Date(year, month - 1, day);
+				const daysOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
+				const dayOfWeek = daysOfWeek[date.getDay()];
+				return dayOfWeek;
+			},
+
 			// 点击日数方法
-			clickActive(year, month, date, index) {
-				console.log('clickActive ====== year/month/date/index', year, month, date, index)
+			clickActive(year, month, day, index) {
+				const dayOfWeek = this.getDayOfWeek(year, month, day);
+				// console.log(dayOfWeek); // 输出：星期五
+				console.log('clickActive ====== 点击的 year/month/date/周', year, month, day, dayOfWeek)
+				this.TWeek = dayOfWeek
 				this.ddList.splice(1, 1, '周二');
 				this.ddList.splice(3, 1, '周四');
+				// console.log('clickActive 今日时间为：' + this.Tyear + '-' + this.Tmonth + '-' +this.Tday )
 			},
 
 			// 点击任务方法
@@ -609,12 +655,15 @@
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-				padding: 40rpx 150rpx;
+				// padding: 20rpx 180rpx;
 
-				/* padding-left: auto; */
-				/* padding-right: auto; */
-				/* margin-left: auto; */
-				/* margin-right: auto; */
+				padding-left: 210rpx;
+				padding-right: 200rpx;
+				padding-top: 18rpx;
+				padding-bottom: 20rpx;
+
+				/* margin-left: auto;
+				margin-right: auto; */
 				.icon {
 					width: 50rpx;
 					height: 50rpx;
@@ -656,12 +705,13 @@
 				// padding-left: 1rpx;
 				position: absolute;
 			}
+
 			.week-item-h {
 				display: flex;
 				// justify-content: center;
 				// align-items: center;				
 				// top: 1%;
-				width: calc(89%/7);				
+				width: calc(89%/7);
 				padding: 0rpx 0rpx;
 				// height: 68%;
 				// margin-left: 5rpx;				
@@ -670,13 +720,13 @@
 				font-size: 28rpx;
 				border-radius: 14rpx;
 				// border: 1px solid #000000; /* 设置 1 像素宽度的黑色边框 */
-				background-color: #F5C8D0;				
+				background-color: #F5C8D0;
 			}
 
 
 			.date-week {
 				display: flex;
-				align-items: center;				
+				align-items: center;
 				justify-content: space-between;
 				flex: 1;
 				// padding-top: 10rpx;
@@ -718,7 +768,8 @@
 					text-align: center;
 					font-size: 30rpx;
 					z-index: 2;
-					color: #ac7984;
+					font-weight: bold;
+					color: #2a1d20;
 					position: relative;
 
 					.day-text {
@@ -731,6 +782,24 @@
 							color: #fff;
 							box-sizing: border-box;
 							background-color: #C37F8F;
+							border-radius: 6rpx;
+							border-radius: 50%;
+						}
+
+						&.cToday {
+							background-color: #ffffff;
+							box-sizing: border-box;
+							border-radius: 6rpx;
+							border-radius: 50%;
+							font-weight: bold;
+							color: #ac7984
+						}
+
+						/* 今天活动 */
+						&.cTodayActive {
+							background-color: #C37F8F;
+							color: #ffffff;
+							box-sizing: border-box;
 							border-radius: 6rpx;
 							border-radius: 50%;
 						}
@@ -748,7 +817,7 @@
 
 					.day-dot {
 						margin-top: 5rpx;
-						background: #dd6161;
+						background: #5ebeff;
 						border-radius: 50%;
 						padding: 6rpx;
 						position: absolute;
@@ -785,8 +854,10 @@
 
 			.toggle {
 				position: relative;
-				padding: 10rpx 0;
-				margin: 23rpx 5rpx 0;
+				// padding: 10rpx 0;
+				padding-top: 28rpx;
+				padding-bottom: 13rpx;
+				margin: 3rpx 5rpx 0;
 				display: flex;
 				justify-content: center;
 
