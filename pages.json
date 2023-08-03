@@ -12,24 +12,34 @@
 					"titleNView": false, //禁用原生导航栏
 					"bounce": "none", //关闭窗口回弹效果
 					"titleNView": {
-						"backButton":{
-						  "color":"#ffffff",						  
-						  "fontSize":"32px"
+						"backButton": {
+							"color": "#ffffff",
+							"fontSize": "32px"
 						}
 					}
 				}
 			}
+		}, {
+			"path": "pages/zui-calendar/components/zui-calendar/TabSwitch/TabSwitch",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
+		}, {
+			"path": "pages/zui-calendar/components/zui-calendar/newItem/newItem",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
+		},
+		{
+			"path": "pages/zui-calendar/components/zui-calendar/jim-datetime-picker/components/jim-datetime-picker/jim-datetime-picker",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
 		}
-	    ,{
-            "path" : "pages/zui-calendar/components/zui-calendar/TabSwitch/TabSwitch",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-    ],
+	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "uni-app",
