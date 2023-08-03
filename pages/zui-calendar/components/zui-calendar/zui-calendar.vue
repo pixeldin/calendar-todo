@@ -2,9 +2,9 @@
 	<view>
 		<view class="date-box">
 			<view class="top-tools" :style="{ display: isOpen ? 'block' : 'none' }">
-				<text class="brief-title-day">{{ day < 10 ? '0' + day : day }} </text>
+				<text class="brief-title-day">{{ typeof day !== 'number' || isNaN(day) ? day : (day < 10 ? '0' + day : day) }} </text>
 				<view :style="{ 'width': '70px' }">
-					<text class="brief-title">{{year}} {{ month < 10 ? '0' + month : month }} 星期三</text>
+					<text class="brief-title">{{year}} {{ month < 10 ? '0' + month : month }} 星期X</text>
 				</view>
 				<view class="down-tip"></view>
 				<view class="select-all"></view>
@@ -22,10 +22,21 @@
 						</view>
 					</view>
 				</view>
+				<!-- 收缩高亮当前周目 -->
+				<view :style="{ display: isOpen ? 'block' : 'none' }">
+					<!-- 高亮框 -->
+					<view class="week-container">						
+						<view v-for="item in weekList" :key="item" class="week-item-h"></view>
+					</view>
+					<!-- <view v-for="item in weekList" :key="item"> -->
+					<!-- <view class="week-item-h"></view> -->
+					<!-- </view> -->
+				</view>
 				<view class="date-week">
+					<!-- 周目 -->
 					<view class="week-item" v-for="item in weekList" :key="item"><text>{{item}}</text></view>
 				</view>
-				<view class="day-content" :style="{height: isOpen ? '100rpx' : 'auto'}" v-if="dayList.length > 0">
+				<view class="day-content" :style="{height: isOpen ? '80rpx' : 'auto'}" v-if="dayList.length > 0">
 					<!-- 背景月份 -->
 					<!-- <view class="day-item day-month" v-if="!isOpen"><text>{{month < 10 ? `0${month}` : month}}</text></view> -->
 					<view class="day-item" v-for="(item, index) in dayList" :key="index" :data-index="index"
@@ -52,7 +63,7 @@
 			<view>
 				<!-- <div class="divider"></div> -->
 				<!-- 胶囊tab切换 -->
-				<TabSwitch :ddList="ddList"/>
+				<TabSwitch :ddList="ddList" />
 			</view>
 			<slot name="task">
 				<view class="task-box" v-if="list.length > 0">
@@ -632,12 +643,47 @@
 				}
 			}
 
+			.week-container {
+				display: flex;
+				// position: relative;
+				// align-items: center;
+				justify-content: space-between;
+				top: 112rpx;
+				// left: 1%;
+				width: 95%;
+				height: 165rpx;
+				left: 21rpx;
+				// padding-left: 1rpx;
+				position: absolute;
+			}
+			.week-item-h {
+				display: flex;
+				// justify-content: center;
+				// align-items: center;				
+				// top: 1%;
+				width: calc(89%/7);				
+				padding: 0rpx 0rpx;
+				// height: 68%;
+				// margin-left: 5rpx;				
+				// margin-left: 3rpx;
+				text-align: center;
+				font-size: 28rpx;
+				border-radius: 14rpx;
+				// border: 1px solid #000000; /* 设置 1 像素宽度的黑色边框 */
+				background-color: #F5C8D0;				
+			}
+
+
 			.date-week {
 				display: flex;
-				align-items: center;
+				align-items: center;				
 				justify-content: space-between;
 				flex: 1;
-				padding: 20rpx;
+				// padding-top: 10rpx;
+				padding-bottom: 3rpx;
+				padding-top: 28rpx;
+				padding-right: 15rpx;
+				padding-left: 15rpx;
 				border-bottom: 1rpx solid #f3f4f6;
 
 				.week-item {
@@ -647,9 +693,10 @@
 					width: calc(100%/7);
 					height: 52rpx;
 					text-align: center;
-					font-size: 30rpx;
+					font-size: 28rpx;
 					/* 星期几标识 */
 					color: #b55370;
+					z-index: 0;
 				}
 			}
 
@@ -658,7 +705,7 @@
 				flex-direction: row;
 				flex-wrap: wrap;
 				align-items: center;
-				padding: 10rpx 20rpx;
+				padding: 3rpx 20rpx;
 				position: relative;
 
 				.day-item {
@@ -669,8 +716,9 @@
 					width: calc(100%/7);
 					height: 70rpx;
 					text-align: center;
-					font-size: 32rpx;
+					font-size: 30rpx;
 					z-index: 2;
+					color: #ac7984;
 					position: relative;
 
 					.day-text {
@@ -738,7 +786,7 @@
 			.toggle {
 				position: relative;
 				padding: 10rpx 0;
-				margin: -10rpx 5rpx 0;
+				margin: 23rpx 5rpx 0;
 				display: flex;
 				justify-content: center;
 
