@@ -9,7 +9,7 @@
 					<text class="brief-title">{{year}} {{ month < 10 ? '0' + month : month }} 星期{{TWeek}}</text>
 				</view>
 				<view class="down-tip"></view>
-				<view class="select-all"></view>
+				<view class="select-all" @tap="selectAll"></view>
 			</view>
 			<view class="box-list" :style="{'margin-bottom' : tasklist.length > 0 ? '20rpx' : '0'}">
 				<!-- 收缩隐藏 -->
@@ -319,20 +319,13 @@
 			this.initTime()
 			this.initApi(this.year, this.month)
 		},
-		onNavigationBarButtonTap(e) {
-			console.log(e)
-			uni.showToast({
-				title: '分享',
-				duration: 2000
-			});
-		},
 		methods: {
 			initTime() {
 				const {
 					year,
 					month,
 					day
-				} = this.getTiemNowDate()
+				} = this.getTimeNowDate()
 				this.year = year
 				this.month = month
 				this.day = day
@@ -340,7 +333,7 @@
 				this.Tmonth = month
 				this.Tday = day
 				this.TWeek = this.getDayOfWeek(this.Tyear, this.Tmonth, this.Tday)
-				console.log('initTime今日时间为：' + this.Tyear + '-' + this.Tmonth + '-' + this.Tday)
+				console.log('### initTime 今日时间为：' + this.Tyear + '-' + this.Tmonth + '-' + this.Tday)
 			},
 			toShrink() {
 				let falg = null
@@ -382,7 +375,7 @@
 				// 修改黑色
 				this.changeDayItemColor('#110c0d', 'bold')
 			},
-			getTiemNowDate() {
+			getTimeNowDate() {
 				var date = new Date()
 				var year = date.getFullYear()
 				var month = parseInt(date.getMonth() + 1)
@@ -486,6 +479,14 @@
 				// console.log('clickActive 今日时间为：' + this.Tyear + '-' + this.Tmonth + '-' +this.Tday )
 			},
 
+			// 全选
+			selectAll(event) {
+				// 在这里编写点击事件的处理逻辑
+				console.log('点击了全选');
+				// 触发自定义事件，通知子页面隐藏 tab-buttons
+				uni.$emit('hideTabButtons');
+			},
+
 			// 点击任务方法
 			clickTask(row, index) {
 				console.log('clickTask ======= row/index', row, index)
@@ -495,14 +496,12 @@
 
 			toActive(item, index) {
 				this.day = item.day
-				// this.$emit('clickActive', {year:this.year, month:this.month, day:item.day, date:this.year + '-' + this.month + '-' +this.day, index: index})
 				this.clickActive(this.year, this.month, item.day, this.year + '-' + this.month + '-' + this.day, index)
 			},
 
 			toTask(item, index) {
 				console.log('toTask')
 				this.clickTask(item, index)
-				// this.$emit('clickTask', {row: item, index: index})
 			},
 
 			LastMonth() {
@@ -819,12 +818,12 @@
 						margin-top: 5rpx;
 						background: #5ebeff;
 						border-radius: 50%;
-						padding: 6rpx;
+						padding: 3.3rpx;
 						position: absolute;
 						bottom: 10rpx;
 
 						&.dot-gray {
-							background: #e8e8e8;
+							background: #aaaaff;
 						}
 					}
 				}

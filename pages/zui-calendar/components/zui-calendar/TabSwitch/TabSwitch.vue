@@ -19,11 +19,25 @@
 				选项卡2的内容
 			</view>
 		</view>
+		<button class="btn-create" @click="createItem()"></button>
 	</view>
 </template>
 
 <script>
 	export default {
+		onLoad() {
+			// 注册自定义事件的监听器
+			uni.$on('hideTabButtons', () => {
+				// 显示 tab-buttons
+				console.log('hideTabButtons ===== 隐藏 tab-buttons/create')
+
+				var selectButtons = document.querySelector('.select-buttons');
+				selectButtons.style.display = 'flex';
+				
+				var createButton = document.querySelector('.btn-create')
+				createButton.style.display = 'none';
+			});
+		},
 		props: {
 			ddList: {
 				type: Array,
@@ -39,6 +53,24 @@
 			switchTab(tabIndex) {
 				console.log('switchTab, index: ', tabIndex)
 				this.activeTab = tabIndex;
+			},
+			resetSelectState () {
+				var selectButtons = document.querySelector('.select-buttons')
+				selectButtons.style.display = 'none'
+				
+				var createButton = document.querySelector('.btn-create')
+				createButton.style.display = 'block';
+			},
+			unselect () {
+				console.log('click unselect')
+				this.resetSelectState()
+			},
+			cancel() {
+				console.log('click cancel-select')
+				this.resetSelectState()
+			},
+			createItem() {
+				console.log('click createItem')
 			}
 		}
 	};
@@ -46,7 +78,8 @@
 
 <style scoped>
 	.select-buttons {
-		display: flex;
+		display: none;
+		/* display: flex; */
 		justify-content: center;
 		align-items: center;
 		width: 100%;
@@ -71,6 +104,19 @@
 		border: none;
 		/* 取消边框 */
 		left: 120rpx;
+	}
+
+	.btn-create {
+		background-image: url('../../../static/icon/create.png');
+		background-size: contain;
+		background-repeat: no-repeat;
+		width: 60px;
+		height: 60px;
+		position: absolute;
+		border: none;
+		border-radius: 50%;
+		top: 80%;
+		left: 80%;
 	}
 
 	.tab-container {
