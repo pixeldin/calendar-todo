@@ -33,7 +33,7 @@
 
 				var selectButtons = document.querySelector('.select-buttons');
 				selectButtons.style.display = 'flex';
-				
+
 				var createButton = document.querySelector('.btn-create')
 				createButton.style.display = 'none';
 			});
@@ -54,14 +54,14 @@
 				console.log('switchTab, index: ', tabIndex)
 				this.activeTab = tabIndex;
 			},
-			resetSelectState () {
+			resetSelectState() {
 				var selectButtons = document.querySelector('.select-buttons')
 				selectButtons.style.display = 'none'
-				
+
 				var createButton = document.querySelector('.btn-create')
 				createButton.style.display = 'block';
 			},
-			unselect () {
+			unselect() {
 				console.log('click unselect')
 				this.resetSelectState()
 			},
@@ -71,6 +71,9 @@
 			},
 			createItem() {
 				console.log('click createItem')
+				uni.navigateTo({
+					url: '/pages/zui-calendar/components/zui-calendar/newItem/newItem'
+				});
 			}
 		}
 	};
@@ -110,8 +113,8 @@
 		background-image: url('../../../static/icon/create.png');
 		background-size: contain;
 		background-repeat: no-repeat;
-		width: 60px;
-		height: 60px;
+		width: 55px;
+		height: 55px;
 		position: absolute;
 		border: none;
 		border-radius: 50%;

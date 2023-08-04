@@ -718,7 +718,7 @@
 				text-align: center;
 				font-size: 28rpx;
 				border-radius: 14rpx;
-				// border: 1px solid #000000; /* 设置 1 像素宽度的黑色边框 */
+				// border: 1px solid #000000; 
 				background-color: #F5C8D0;
 			}
 
