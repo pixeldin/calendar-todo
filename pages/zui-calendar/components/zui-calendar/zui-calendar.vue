@@ -67,7 +67,14 @@
 			<view>
 				<!-- <div class="divider"></div> -->
 				<!-- 胶囊tab切换 -->
-				<TabSwitch :ddList="ddList" />
+				<!-- 
+				Tyear: 2023,
+				Tmonth: 8,
+				Tday: 1,
+				TWeek: "日" 
+				-->
+				<TabSwitch :ddList="ddList" :Tyear="Tyear" :Tmonth="Tmonth" :Tday="Tday" :TWeek="TWeek"
+					@dataUpdated="handleDataUpdate" />
 			</view>
 			<slot name="task">
 				<view class="task-box" v-if="tasklist.length > 0">
@@ -289,6 +296,8 @@
 		},
 		data() {
 			return {
+				// 接受来自子页面
+				receivedData: null,
 				dayList: [],
 				year: 2023,
 				month: 8,
@@ -320,6 +329,11 @@
 			this.initApi(this.year, this.month)
 		},
 		methods: {
+			handleDataUpdate(data) {
+				this.receivedData = data;
+				console.log('收到子页面传来的数据:', this.receivedData);
+				// 在这里可以使用接收到的数据进行后续处理
+			},
 			initTime() {
 				const {
 					year,
@@ -333,7 +347,8 @@
 				this.Tmonth = month
 				this.Tday = day
 				this.TWeek = this.getDayOfWeek(this.Tyear, this.Tmonth, this.Tday)
-				console.log('### initTime 今日时间为：' + this.Tyear + '-' + this.Tmonth + '-' + this.Tday)
+				console.log('### initTime 今日时间为：' + this.Tyear + '-' + this.Tmonth + '-' + this.Tday, '周', this.TWeek)
+				// TODO... 更新相应属性, 准备传递给创建页面
 			},
 			toShrink() {
 				let falg = null
@@ -473,10 +488,15 @@
 				const dayOfWeek = this.getDayOfWeek(year, month, day);
 				// console.log(dayOfWeek); // 输出：星期五
 				console.log('clickActive ====== 点击的 year/month/date/周', year, month, day, dayOfWeek)
+				// 更新相应属性, 准备传递给创建页面
+				this.Tyear = year
+				this.Tmonth = month
+				this.Tday = day
 				this.TWeek = dayOfWeek
 				this.ddList.splice(1, 1, '周二');
 				this.ddList.splice(3, 1, '周四');
 				// console.log('clickActive 今日时间为：' + this.Tyear + '-' + this.Tmonth + '-' +this.Tday )
+
 			},
 
 			// 全选

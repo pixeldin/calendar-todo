@@ -50,7 +50,7 @@
 				<!-- 上方文本和输入框 -->
 				<view class="top-section">
 					<span class="mark-text">备注</span>
-					<input type="text" class="input-box" placeholder="请填写备注">
+					<input type="text" class="input-box" placeholder="请填写备注" v-model="remark">
 				</view>
 
 				<!-- 水平线的容器 -->
@@ -70,22 +70,24 @@
 		</view>
 
 		<view class="pxp-card-time">
-			<view>
-
+			<view class="set-day">
+				<span class="set-day-title">时间</span>
+				<span class="select-day">2023/7/15周日 </span>				
+				<image class="tip-icon"></image>
 			</view>
 			<!-- Start 时间设置 -->
 			<view class="startAt">
 				<text @click="clickStart" class="uni-datetime-picker-sign a-sign-left">起始</text>
-				<text class="uni-datetime-picker-sign ax-sign-left">{{shour}}</text>
+				<text class="uni-datetime-picker-sign ax-sign-left">{{ shour < 10 ? '0' + shour : shour }}</text>
 				<text class="uni-datetime-picker-sign a-sign-center">时</text>
-				<text class="uni-datetime-picker-sign ax-sign-center">{{smin}}</text>
+				<text class="uni-datetime-picker-sign ax-sign-center">{{ smin < 10 ? '0' + smin : smin }}</text>
 				<text class="uni-datetime-picker-sign a-sign-right">分</text>
 			</view>
 			<view class="endAt">
 				<text @click="clickEnd" class="uni-datetime-picker-sign e-sign-left">结束</text>
-				<text class="uni-datetime-picker-sign ex-sign-left">{{ehour}}</text>
+				<text class="uni-datetime-picker-sign ex-sign-left">{{ ehour < 10 ? '0' + ehour : ehour }}</text>
 				<text class="uni-datetime-picker-sign e-sign-center">时</text>
-				<text class="uni-datetime-picker-sign ex-sign-center">{{emin}}</text>
+				<text class="uni-datetime-picker-sign ex-sign-center">{{ emin < 10 ? '0' + emin : emin }}</text>
 				<text class="uni-datetime-picker-sign e-sign-right">分</text>
 			</view>
 			<!-- End 时间设置 -->
@@ -138,6 +140,13 @@
 		</view>
 
 		<view class="pxp-card-color">
+			<span class="color-title">颜色</span>
+			<view class="color-item">
+				<view v-for="(color, index) in colorArray" :key="index"
+					:class="['color-circle', { active: selectedColorIndex === index }]"
+					:style="{ backgroundColor: color }" @click="selectColor(index)">
+				</view>
+			</view>
 		</view>
 	</view>
 
@@ -151,6 +160,19 @@
 		name: 'PxpDatetimePicker',
 		data() {
 			return {
+				colorArray: ["#5FBFFF", "#DD5C5C", "#FF9A02", "#B347FF", "#79BB31", "#38B576", "#6488FF", "#9896FF",
+					"#C4C4C4",
+					"#9933CC"
+				],
+				// 备注
+				remark: '',
+				// 颜色下标
+				selectedColorIndex: -1,
+				// 起始与结束
+				shour: 0,
+				smin: 0,
+				ehour: 0,
+				emin: 0,
 				shakebtn: {
 					'0': {
 						iconUrl: '../../../static/icon/btn-unclick.png',
@@ -208,11 +230,6 @@
 				hour: 0,
 				minute: 0,
 				second: 0,
-				// 起始与结束
-				shour: 0,
-				smin: 0,
-				ehour: 0,
-				emin: 0,
 				clearText: "清除",
 				cancelText: "取消",
 				okText: "确定"
@@ -481,27 +498,42 @@
 				this.weekItems[weekDay].selected = !this.weekItems[weekDay].selected;
 				if (this.weekItems[weekDay].selected) {
 					this.weekItems[weekDay].iconUrl = '../../../static/icon/select-week.png';
-					console.log(weekDay + '被选中了');
+					// console.log(weekDay + '被选中');
 				} else {
 					this.weekItems[weekDay].iconUrl = '../../../static/icon/unselect-week.png';
-					console.log(weekDay + '被取消选中');
+					// console.log(weekDay + '被取消选中');
 				}
 				// 获取当前选中的所有周天
 				const selectedDays = Object.keys(this.weekItems).filter(day => this.weekItems[day].selected);
 				console.log("当前选中的周天：", selectedDays);
 			},
 			toggleIcon(id) {
+				console.log('toggleIcon click');
 				this.shakebtn[id].selected = !this.shakebtn[id].selected;
 				if (this.shakebtn[id].selected) {
-					this.shakebtn[id].iconUrl = '../../../static/icon/btn-unclick.png';
-				} else {
 					this.shakebtn[id].iconUrl = '../../../static/icon/btn-clicked.png';
-					console.log('toggleIcon 被取消选中');
+					console.log('打开震动');
+				} else {
+					this.shakebtn[id].iconUrl = '../../../static/icon/btn-unclick.png';
+					console.log('取消震动');
 				}
-				console.log('toggleIcon click');
+			},
+			// 颜色选择
+			selectColor(index) {
+				this.selectedColorIndex = index;
+				console.log('selectColor 选中颜色:', this.colorArray[this.selectedColorIndex]);
 			},
 			clickSave() {
 				console.log("clickSave 保存!");
+				console.log('备注:', this.remark);
+				console.log('选中颜色:', this.colorArray[this.selectedColorIndex]);
+				console.log('起始时间:', this.shour, ':', this.smin,
+					' to ', this.ehour, ':', this.emin);
+
+				// TODO 传递数据过去
+				uni.navigateTo({
+					url: '/pages/zui-calendar/components/zui-calendar/zui-calendar'
+				});
 			}
 		},
 		mounted() {}
@@ -510,7 +542,8 @@
 
 <style lang="scss">
 	.bg-root {
-		background-color: #f6f6f6;
+		background-color: #eeeeee;
+		height: 100vh;
 	}
 
 	.pxp-card-top {
@@ -524,20 +557,25 @@
 
 	.pxp-top-cancel {
 		position: relative;
+		font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+		font-size: 18px;
 		font-weight: bold;
 		padding-top: 17px;
 		padding-left: 20px;
 	}
 
 	.pxp-top-title {
-		font-weight: bold;
+		font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+		// font-weight: bold;
 		font-size: 20px;
 		margin: 0 auto;
 		position: relative;
-		padding-top: 12px;
+		padding-top: 14px;
 	}
 
 	.pxp-top-save {
+		font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+		font-size: 18px;
 		font-weight: bold;
 		position: relative;
 		padding-top: 17px;
@@ -608,7 +646,8 @@
 
 	.mark-text {
 		position: relative;
-		font-size: 22px;
+		font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+		font-size: 20px;
 		font-weight: bold;
 		top: -3%;
 		left: -10%;
@@ -636,7 +675,7 @@
 		// color: #FFFFFF;
 		cursor: pointer;
 	}
-	
+
 	.shake-text {
 		position: relative;
 		top: 3px;
@@ -644,7 +683,7 @@
 		font-size: 20px;
 		// left: 100px;
 	}
-	
+
 	.shake-btn-icon {
 		width: 55px;
 		height: 55px;
@@ -661,17 +700,77 @@
 
 	.pxp-card-time {
 		padding-top: 10px;
-		height: 250px;
+		height: 240px;
 		// height: auto;
 		width: 100%;
-		background-color: #58aa24;
-		margin-bottom: 10px;
+		background-color: #ffffff;
+		margin-bottom: 13px;
+	}
+	
+	.set-day {
+		position: relative;
+		top: 12%;
+		left: 7%;
+	}
+	
+	.set-day-title {		
+		font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+		font-size: 20px;
+		font-weight: bold;
+	}
+	.select-day {
+		padding-left: 20px;
+		font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+		font-size: 18px;
+	}
+	.tip-icon{
+		background-image: url('../../../static/icon/down-tip.png');
+		background-size: contain;
+		background-repeat: no-repeat;
+		width: 10px;
+		height: 10px;
+		padding-left: 32px;
 	}
 
 	.pxp-card-color {
-		height: 130px;
+		height: 120px;
 		width: 100%;
-		background-color: #aa265f;
+		background-color: #ffffff;
+	}
+
+	.color-title {
+		position: relative;
+		font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+		font-size: 20px;
+		font-weight: bold;
+		top: 39%;
+		left: 7%;
+		font-size: 20px;
+	}
+
+	.color-item {
+		// border: 1px solid #3025cc;
+		position: relative;
+		width: 75%;
+		height: 20%;
+		top: 22%;
+		left: 19%;
+		display: flex;
+		justify-content: center;
+	}
+
+	.color-circle {
+		width: 20px;
+		height: 20px;
+		border-radius: 50%;
+		margin: 0 5px;
+		cursor: pointer;
+	}
+
+	.active {
+		background-image: url('../../../static/icon/color-select.png');
+		background-size: contain;
+		background-repeat: no-repeat;
 	}
 
 	$uni-primary: #007aff !default;
@@ -703,10 +802,12 @@
 	}
 
 	.uni-datetime-picker-item {
+		padding-left: 32px;
+		// padding-right: 10px;
 		height: 50px;
 		line-height: 50px;
 		text-align: center;
-		font-size: 14px;
+		font-size: 16px;
 	}
 
 	.uni-datetime-picker-btn {
@@ -747,30 +848,28 @@
 	}
 
 	.picker-pop {
+		position: relative;
+		top: 105px;
+		left: 207px;
 		border-radius: 8px;
-		padding: 30px;
-		width: 270px;
-		background-color: #fff;
-		border: 1px solid #26aa6d;
-		position: fixed;
-		top: 50%;
-		left: 50%;
+		width: 310px;
+		// background-color: #fff;
+		// border: 1px solid #26aa6d;
 		transform: translate(-50%, -50%);
 		transition-duration: 0.3s;
 		display: none;
 	}
 
-	/* pxp diy s*/
+	// 结束时间选择器
 	.picker-pop-end {
+		position: relative;
+		top: 152px;
+		left: 206px;
 		border-radius: 8px;
-		padding: 30px;
-		width: 270px;
-		background-color: #fff;
+		width: 310px;
+		// background-color: #fff;
 		// opacity: 0.95;
-		border: 1px solid #000000;
-		position: fixed;
-		top: 57%;
-		left: 50%;
+		// border: 1px solid #000000;
 		transform: translate(-50%, -50%);
 		transition-duration: 0.3s;
 		display: none;
@@ -794,7 +893,7 @@
 
 	.uni-datetime-picker-timebox {
 
-		border: 1px solid #E5E5E5;
+		// border: 1px solid #E5E5E5;
 		border-radius: 5px;
 		padding: 7px 10px;
 		/* #ifndef APP-NVUE */
@@ -823,35 +922,29 @@
 	}
 
 	.uni-datetime-picker-sign {
+		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		font-size: 18px;
+		color: #b6b6b6;
 		position: absolute;
 		top: 53px;
 		/* 减掉 10px 的元素高度，兼容nvue */
 		color: #999;
-		/* #ifdef APP-NVUE */
-		font-size: 16px;
-		/* #endif */
 	}
 
 	.startAt {
+		// border: 1px solid #0fa5e5;
 		position: relative;
-		top: 20%;
-		border: 1px solid #0fa5e5;
+		top: 74px;
 		width: 100%;
-		margin-left: auto;
-		margin-right: auto;
-		height: 40rpx;
-		z-index: 20000;
+		height: 40px;
 	}
 
 	.endAt {
+		// border: 1px solid #e54915;
 		position: relative;
-		top: 40%;
-		border: 1px solid #e54915;
+		top: 82px;
 		width: 100%;
-		margin-left: auto;
-		margin-right: auto;
-		height: 40rpx;
-		z-index: 20000;
+		height: 40px;
 	}
 
 	.sign-left {
@@ -859,11 +952,11 @@
 	}
 
 	.sign-center {
-		left: 85px;
+		left: 115px;
 	}
 
 	.sign-right {
-		right: 86px;
+		right: 79px;
 	}
 
 	.btn-start {
@@ -874,7 +967,7 @@
 		border: none;
 		width: 25px;
 		height: 25px;
-		right: 2px;
+		right: -40px;
 		border-radius: 50%;
 		// top: 80%;
 		// left: 40%;
@@ -888,93 +981,100 @@
 		width: 25px;
 		height: 25px;
 		position: relative;
-		right: 2px;
+		right: -40px;
 		border-radius: 50%;
 	}
 
+	// 起始
 	.a-sign-left {
 		position: relative;
-		left: 8.5%;
-		top: 47.3%;
-		z-index: 10000;
-		color: #007aff;
+		left: 12.5%;
+		top: 48.3%;
+		// color: #007aff;
 	}
 
+	// 起始时间
 	.ax-sign-left {
 		position: relative;
-		left: 12.2%;
+		left: 21.5%;
 		top: 47.3%;
-		z-index: 10000;
-		color: #2fff58;
+		font-weight: bold;
+		color: #000000;
+		// color: #2fff58;
 	}
 
+	// 时
 	.a-sign-center {
 		position: relative;
-		left: 17.2%;
+		left: 33.2%;
 		top: 47.3%;
 		z-index: 10000;
-		color: #007aff;
+		// color: #007aff;
 	}
 
+	// 时结果
 	.ax-sign-center {
 		position: relative;
-		left: 22.2%;
+		left: 45.0%;
 		top: 47.3%;
-		z-index: 10000;
-		color: #2fff58;
+		font-weight: bold;
+		color: #000000;		
+		// color: #2fff58;
 	}
 
+	// 分
 	.a-sign-right {
 		position: relative;
-		left: 42.2%;
+		left: 58.2%;
 		top: 47.3%;
-		z-index: 10000;
-		color: #007aff;
+		// color: #007aff;
 	}
 
-
+	// 结束
 	.e-sign-left {
 		position: relative;
-		left: 8.5%;
-		top: 53.7%;
-		z-index: 10000;
-		color: #007aff;
+		left: 12.5%;
+		top: 47.7%;
+		// color: #007aff;
 	}
 
+	// 结束时结果
 	.ex-sign-left {
 		position: relative;
-		left: 12.2%;
+		font-weight: bold;
+		color: #000000;
+		left: 21.2%;
 		top: 53.7%;
-		z-index: 10000;
-		color: #a527ff;
 	}
 
+	// 结束时
 	.e-sign-center {
 		position: relative;
-		left: 17.2%;
+		left: 33.2%;
 		top: 53.7%;
 		z-index: 10000;
-		color: #007aff;
+		// color: #007aff;
 	}
 
 	.ex-sign-center {
 		position: relative;
-		left: 22.2%;
+		left: 45.2%;
 		top: 53.7%;
-		z-index: 10000;
-		color: #a527ff;
+		font-weight: bold;
+		color: #000000;
+		// color: #a527ff;
 	}
 
 	.e-sign-right {
 		position: relative;
-		left: 42.2%;
+		left: 58.5%;
 		top: 53.7%;
-		z-index: 10000;
-		color: #007aff;
+		// color: #007aff;
 	}
 
 	.picker-container {
 		position: relative;
+		// background-color: #a527ff;
 		display: flex;
 		align-items: center;
 		justify-content: center;

@@ -23,7 +23,7 @@
 	</view>
 </template>
 
-<script>
+<script>	
 	export default {
 		onLoad() {
 			// 注册自定义事件的监听器
@@ -42,7 +42,11 @@
 			ddList: {
 				type: Array,
 				default: () => ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
-			}
+			},
+			Tyear: 2023,
+			Tmonth: 8,
+			Tday: 1,
+			TWeek: "日"
 		},
 		data() {
 			return {
@@ -70,7 +74,8 @@
 				this.resetSelectState()
 			},
 			createItem() {
-				console.log('click createItem')
+				console.log('Todo pass newItem, 目标天:', this.Tyear, this.Tmonth, this.Tday, '周', this.TWeek)
+				const Tyear = this.Tyear;				
 				uni.navigateTo({
 					url: '/pages/zui-calendar/components/zui-calendar/newItem/newItem'
 				});
