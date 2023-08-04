@@ -27,7 +27,7 @@
 			}
 		}, {
 			"path": "pages/zui-calendar/components/zui-calendar/newItem/newItem",
-			"style": {				
+			"style": {
 				"navigationStyle": "custom",
 				"onReachBottomDistance": 70,
 				"app-plus": {

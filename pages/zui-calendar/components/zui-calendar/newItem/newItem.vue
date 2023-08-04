@@ -72,7 +72,7 @@
 		<view class="pxp-card-time">
 			<view class="set-day">
 				<span class="set-day-title">时间</span>
-				<span class="select-day">2023/7/15周日 </span>				
+				<span class="select-day">{{selectDay}} 周{{selectWeekDay}} </span>
 				<image class="tip-icon"></image>
 			</view>
 			<!-- Start 时间设置 -->
@@ -160,6 +160,9 @@
 		name: 'PxpDatetimePicker',
 		data() {
 			return {
+				// 来自日历天
+				selectDay: '',
+				selectWeekDay: '',
 				colorArray: ["#5FBFFF", "#DD5C5C", "#FF9A02", "#B347FF", "#79BB31", "#38B576", "#6488FF", "#9896FF",
 					"#C4C4C4",
 					"#9933CC"
@@ -234,6 +237,12 @@
 				cancelText: "取消",
 				okText: "确定"
 			}
+		},
+		onLoad: function(option) {
+			// 接收来自上一页参数
+			this.selectDay = option.Tyear + '/' + option.Tmonth + '/' + option.Tday
+			this.selectWeekDay = option.Tweek
+			console.log('onLoad------', option.Tyear, option.Tmonth, option.Tday, option.Tweek);
 		},
 		watch: {
 			hours(newVal) {
@@ -512,7 +521,7 @@
 				this.shakebtn[id].selected = !this.shakebtn[id].selected;
 				if (this.shakebtn[id].selected) {
 					this.shakebtn[id].iconUrl = '../../../static/icon/btn-clicked.png';
-					console.log('打开震动');
+					console.log('打开震动 来自日历:::', this.$route.params.id);
 				} else {
 					this.shakebtn[id].iconUrl = '../../../static/icon/btn-unclick.png';
 					console.log('取消震动');
@@ -530,9 +539,16 @@
 				console.log('起始时间:', this.shour, ':', this.smin,
 					' to ', this.ehour, ':', this.emin);
 
-				// TODO 传递数据过去
+				// 传递当前数据过去
 				uni.navigateTo({
-					url: '/pages/zui-calendar/components/zui-calendar/zui-calendar'
+					url: '/pages/zui-calendar/components/zui-calendar/zui-calendar?' +
+						'newDay=' +  this.selectDay +
+						'&remark=' + this.remark +
+						'&color=' + this.colorArray[this.selectedColorIndex] +
+						'&shour=' + this.shour +
+						'&ehour=' + this.ehour +
+						'&smin=' + this.smin +
+						'&emin=' + this.emin
 				});
 			}
 		},
@@ -706,30 +722,33 @@
 		background-color: #ffffff;
 		margin-bottom: 13px;
 	}
-	
+
 	.set-day {
 		position: relative;
 		top: 12%;
 		left: 7%;
 	}
-	
-	.set-day-title {		
+
+	.set-day-title {
 		font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 		font-size: 20px;
 		font-weight: bold;
 	}
+
 	.select-day {
-		padding-left: 20px;
+		padding-left: 23px;
 		font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 		font-size: 18px;
 	}
-	.tip-icon{
+
+	.tip-icon {
 		background-image: url('../../../static/icon/down-tip.png');
 		background-size: contain;
 		background-repeat: no-repeat;
-		width: 10px;
-		height: 10px;
-		padding-left: 32px;
+		width: 12px;
+		height: 12px;
+		top: 2px;
+		left: 13px;
 	}
 
 	.pxp-card-color {
@@ -1018,7 +1037,7 @@
 		left: 45.0%;
 		top: 47.3%;
 		font-weight: bold;
-		color: #000000;		
+		color: #000000;
 		// color: #2fff58;
 	}
 

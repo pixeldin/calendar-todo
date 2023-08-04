@@ -73,8 +73,7 @@
 				Tday: 1,
 				TWeek: "日" 
 				-->
-				<TabSwitch :ddList="ddList" :Tyear="Tyear" :Tmonth="Tmonth" :Tday="Tday" :TWeek="TWeek"
-					@dataUpdated="handleDataUpdate" />
+				<TabSwitch :ddList="ddList" :Tyear="Tyear" :Tmonth="Tmonth" :Tday="Tday" :TWeek="TWeek" />
 			</view>
 			<slot name="task">
 				<view class="task-box" v-if="tasklist.length > 0">
@@ -296,6 +295,7 @@
 		},
 		data() {
 			return {
+				todoList: {},
 				// 接受来自子页面
 				receivedData: null,
 				dayList: [],
@@ -314,7 +314,43 @@
 		components: {
 			TabSwitch
 		},
-		onLoad() {},
+		onLoad: function(option) {
+			if (!option.newDay) {
+				console.log('--------- onLoad ---------')
+				return
+			}
+			// 接收来自上一页参数
+			console.log('onLoad=========', option.newDay)
+			console.log('onLoad=========', option.remark)
+			console.log('onLoad=========', option.color)
+			console.log('onLoad=========', option.shour)
+			console.log('onLoad=========', option.ehour)
+			console.log('onLoad=========', option.smin)
+			console.log('onLoad=========', option.emin)
+
+			// 接收来自上一页参数
+			const newDay = option.newDay;
+
+			// 检查是否已存在该日期的记录，若不存在则创建一个新的数组
+			if (!this.todoList.hasOwnProperty(newDay)) {
+				console.log('############# todoList创建一个新的数组 ########')
+				this.todoList[newDay] = [];
+			}
+
+			// 创建新的todo对象
+			const todo = {
+				sTimeHour: option.shour || '00',
+				eTimeHour: option.ehour || '00',
+				sTimeMin: option.smin || '00',
+				eTimeMin: option.emin || '00',
+				mark: option.remark || '',
+				finished: false,
+				uuid: Date.now() // 时间戳作为唯一标识
+			};
+
+			// 将todo对象添加到对应日期的数组中
+			this.todoList[newDay].push(todo);
+		},
 		created() {
 			this.isOpen = this.isUnfold
 			const {
@@ -329,10 +365,52 @@
 			this.initApi(this.year, this.month)
 		},
 		methods: {
-			handleDataUpdate(data) {
-				this.receivedData = data;
-				console.log('收到子页面传来的数据:', this.receivedData);
-				// 在这里可以使用接收到的数据进行后续处理
+			printTodoList() {
+				console.log(todoList)
+				for (const key in this.todoList) {
+					if (this.todoList.hasOwnProperty(key)) {
+						console.log(`日期：${key}`);
+						console.log("=============");
+
+						const todos = this.todoList[key];
+
+						if (todos.length === 0) {
+							console.log("暂无记录");
+						} else {
+							todos.forEach(todo => {
+								console.log(`开始时间：${todo.sTimeHour}:${todo.sTimeMin}`);
+								console.log(`结束时间：${todo.eTimeHour}:${todo.eTimeMin}`);
+								console.log(`备注：${todo.mark}`);
+								console.log(`状态：${todo.finished ? "已完成" : "未完成"}`);
+								console.log(`标识：${todo.uuid}`);
+								console.log("---------------");
+							});
+						}
+
+						console.log(""); // 输出空行分隔每个日期的内容
+					}
+				}
+			},
+			// 删除todo
+			deleteTodoItem(key, uuid) {
+				// 根据日期和uuid查找对应的todo对象所在的索引
+				const index = this.todoList[key].findIndex(item => item.uuid === uuid);
+
+				// 如果找到了对应的todo对象，则从数组中删除
+				if (index !== -1) {
+					this.todoList[key].splice(index, 1);
+				}
+			},
+
+			// 更新todo的finished状态
+			updateTodoStatus(key, uuid, status) {
+				// 根据日期和uuid查找对应的todo对象所在的索引
+				const index = this.todoList[key].findIndex(item => item.uuid === uuid);
+
+				// 如果找到了对应的todo对象，则更新其finished状态
+				if (index !== -1) {
+					this.todoList[key][index].finished = status;
+				}
 			},
 			initTime() {
 				const {
@@ -510,8 +588,10 @@
 			// 点击任务方法
 			clickTask(row, index) {
 				console.log('clickTask ======= row/index', row, index)
-				this.ddList.splice(1, 1, 'Two');
-				this.ddList.splice(3, 1, 'Thursday');
+				this.ddList.splice(1, 1, 'Two')
+				this.ddList.splice(3, 1, 'Thursday')
+
+				this.printTodoList()
 			},
 
 			toActive(item, index) {

@@ -23,7 +23,7 @@
 	</view>
 </template>
 
-<script>	
+<script>
 	export default {
 		onLoad() {
 			// 注册自定义事件的监听器
@@ -75,9 +75,13 @@
 			},
 			createItem() {
 				console.log('Todo pass newItem, 目标天:', this.Tyear, this.Tmonth, this.Tday, '周', this.TWeek)
-				const Tyear = this.Tyear;				
+				const Tyear = this.Tyear;
 				uni.navigateTo({
-					url: '/pages/zui-calendar/components/zui-calendar/newItem/newItem'
+					url: '/pages/zui-calendar/components/zui-calendar/newItem/newItem' +
+						'?Tyear=' + this.Tyear +
+						'&Tmonth=' + this.Tmonth +
+						'&Tday=' + this.Tday +
+						'&Tweek=' + this.TWeek
 				});
 			}
 		}
