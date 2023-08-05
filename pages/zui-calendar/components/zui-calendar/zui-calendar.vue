@@ -73,51 +73,7 @@
 				Tday: 1,
 				TWeek: "日" 
 				-->
-				<TabSwitch :ddList="ddList" :Tyear="Tyear" :Tmonth="Tmonth" :Tday="Tday" :TWeek="TWeek" />
-			</view>
-			<slot name="task">
-				<view class="task-box" v-if="tasklist.length > 0">
-					<view class="task-item" v-for="(item, index) in tasklist" :key="index" @click="toTask(item, index)">
-						<view class="avatar-box">
-							<view class="avatar">
-								<image :src="item.avatar"></image>
-							</view>
-							<view class="title-box">
-								<view class="title"><text>{{item.title}}</text></view>
-								<view class="date"><text
-										class="branch">时间：{{item.time}}</text><text>{{item.details}}</text></view>
-							</view>
-						</view>
-						<view class="time"><text>{{item.date}}</text></view>
-					</view>
-				</view>
-			</slot>
-		</view>
-		<view class="modal" v-if="show">
-			<view class="mask" @click="close" v-if="closeOnClickOverlay"></view>
-			<view class="z-content">
-				<view class="modal-content">
-					<view class="z-modal" :style="{width: width}">
-						<view class="modal-title">
-							<slot name="title"><text>{{title}}</text></slot>
-						</view>
-						<view class="z-modal-content">
-							<slot name="content"><text>{{content}}</text></slot>
-						</view>
-						<view class="line"></view>
-						<view class="modal-foot">
-							<slot name="footer">
-								<view class="cancel" @click="cancel" v-if="showCancelButton">
-									<text :style="{color: cancelColor}">{{cancelText}}</text>
-								</view>
-								<view class="foot-line" v-if="showCancelButton && showConfirmButton"></view>
-								<view class="confirm" @click="confirm" v-if="showConfirmButton">
-									<text :style="{color: confirmColor}">{{confirmText}}</text>
-								</view>
-							</slot>
-						</view>
-					</view>
-				</view>
+				<TabSwitch :jobList="todoList" :Tyear="Tyear" :Tmonth="Tmonth" :Tday="Tday" :TWeek="TWeek" ref="tabSwitchRef"/>
 			</view>
 		</view>
 	</view>
@@ -132,62 +88,7 @@
 			tasklist: {
 				type: Array,
 				default: () => {
-					return [{
-							avatar: 'https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/6acec660-4f31-11eb-a16f-5b3e54966275.jpg',
-							title: '英语词汇',
-							time: '38分钟',
-							details: '点击填写心得',
-							date: '10:30'
-						},
-						{
-							avatar: 'https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/6acec660-4f31-11eb-a16f-5b3e54966275.jpg',
-							title: '英语词汇',
-							time: '37分钟',
-							details: '点击填写心得',
-							date: '10:30'
-						},
-						{
-							avatar: '',
-							title: 'WPS签到',
-							// time: '45分钟',
-							details: '点击填写心得',
-							date: '10:30'
-						},
-						// {
-						// 	avatar: 'https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/6acec660-4f31-11eb-a16f-5b3e54966275.jpg',
-						// 	title: '淘宝农场',
-						// 	// time: '45分钟',
-						// 	details:'点击填写心得',
-						// 	date: '10:30'
-						// },
-						// {
-						// 	avatar: 'https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/6acec660-4f31-11eb-a16f-5b3e54966275.jpg',
-						// 	title: '英语语法',
-						// 	// time: '45分钟',
-						// 	details:'点击填写心得',
-						// 	date: '10:30'
-						// },
-						// {
-						// 	avatar: 'https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/6acec660-4f31-11eb-a16f-5b3e54966275.jpg',
-						// 	title: 'QQ农场',
-						// 	// time: '45分钟',
-						// 	details:'点击填写心得',
-						// 	date: '11:30'
-						// },
-						// {
-						// 	avatar: 'https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/6acec660-4f31-11eb-a16f-5b3e54966275.jpg',
-						// 	title: '京东抢购',
-						// 	// time: '45分钟',
-						// 	details:'点击填写心得',
-						// 	date: '12:30'
-						// },
-						{
-							avatar: 'https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/6acec660-4f31-11eb-a16f-5b3e54966275.jpg',
-							title: '火车票',
-							// time: '45分钟',
-							details: '点击填写心得',
-							date: '11:37'
-						}
+					return [
 					]
 				}
 			},
@@ -303,20 +204,23 @@
 				year: 2023,
 				month: 8,
 				day: 1,
-				// today
+				// absDay 绝对时间, 启动时刻的日期
+				Ayear: 2023,
+				Amonth: 8,
+				Aday: 1,
+				AWeek: 1,
+				// selectday
 				Tyear: 2023,
 				Tmonth: 8,
 				Tday: 1,
 				TWeek: "日",
-				isOpen: false,
-				ddList: ['一', '2', '3', 'THU', 'FRI', 'SAT', '日'],
+				isOpen: false
 			}
 		},
 		components: {
 			TabSwitch
 		},
-		onLoad: function(option) {
-			console.log('Pxp --------- onLoad from js---------', saveJob.job)
+		onLoad: function(option) {			
 			console.log('Pxp --------- onLoad from js---------', saveJob.jobList)
 			if (!option.newDay) {
 				console.log('--------- onLoad ---------')
@@ -354,7 +258,7 @@
 
 			// 将todo对象添加到对应日期的数组中
 			this.todoList[newDay].push(todo);
-			saveJob.updateJobList(option.remark, this.todoList)
+			saveJob.updateJobList(this.todoList)
 		},
 		created() {
 			this.isOpen = this.isUnfold
@@ -370,6 +274,10 @@
 			this.initApi(this.year, this.month)
 		},
 		methods: {
+			updateJob(y,m,d,status) {
+				this.$refs.tabSwitchRef.getDayJob(y,m,d,status);
+				// this.$refs.tabSwitchRef.switchTab(2)
+			},
 			printTodoList() {
 				console.log(this.todoList)
 				for (const key in this.todoList) {
@@ -422,14 +330,22 @@
 					year,
 					month,
 					day
-				} = this.getTimeNowDate()
+				} = this.getTimeNowDate()				
 				this.year = year
 				this.month = month
 				this.day = day
+				
+				var wk = this.getDayOfWeek(this.Tyear, this.Tmonth, this.Tday)
 				this.Tyear = year
 				this.Tmonth = month
 				this.Tday = day
-				this.TWeek = this.getDayOfWeek(this.Tyear, this.Tmonth, this.Tday)
+				this.TWeek = wk
+				
+				// 绝对时间赋值
+				this.Ayear = year
+				this.Amonth = month
+				this.Aday = day				
+				this.AWeek = wk
 				console.log('### initTime 今日时间为：' + this.Tyear + '-' + this.Tmonth + '-' + this.Tday, '周', this.TWeek)
 				// TODO... 更新相应属性, 准备传递给创建页面
 			},
@@ -508,7 +424,7 @@
 			createDayList(year, month) {
 				console.log("Pxp createDayList###################, year/month", year, month)
 				let tflag = false
-				if (year === this.Tyear && month === this.Tmonth) {
+				if (year === this.Ayear && month === this.Amonth) {
 					tflag = true
 				}
 				const count = this.getDayNum(year, month)
@@ -531,8 +447,9 @@
 						today: false,
 						data
 					}
-					if (tflag && i === this.Tday) {
-						// console.log("Pxp reset Today!")
+					if (tflag && i === this.Aday) {
+						console.log("Pxp reset Today!")
+						console.log("Pxp 当前 Tyear/Tmonth/Tday", this.Ayear, this.Amonth, this.Aday)
 						obj.today = true;
 					}
 					list.push(obj)
@@ -576,10 +493,9 @@
 				this.Tmonth = month
 				this.Tday = day
 				this.TWeek = dayOfWeek
-				this.ddList.splice(1, 1, '周二');
-				this.ddList.splice(3, 1, '周四');
 				// console.log('clickActive 今日时间为：' + this.Tyear + '-' + this.Tmonth + '-' +this.Tday )
-
+				// TODO 默认看已完成'true'
+				this.updateJob(this.Tyear, this.Tmonth, this.Tday, false);
 			},
 
 			// 全选
@@ -593,8 +509,6 @@
 			// 点击任务方法
 			clickTask(row, index) {
 				console.log('clickTask ======= row/index', row, index)
-				this.ddList.splice(1, 1, 'Two')
-				this.ddList.splice(3, 1, 'Thursday')
 
 				console.log('--------- clickTask job from js---------', saveJob.job)
 				this.printTodoList()

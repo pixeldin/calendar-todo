@@ -1,21 +1,19 @@
-const now = Date.now || function () {  
-    return new Date().getTime();  
-};  
-const isArray = Array.isArray || function (obj) {  
-    return obj instanceof Array;  
-};  
+const now = Date.now || function() {
+	return new Date().getTime();
+};
+const isArray = Array.isArray || function(obj) {
+	return obj instanceof Array;
+};
 
-var job = 'pxpJob';
 var jobList = {};
-function updateJobList(title, newJobList) {
-  job = title;
-  jobList = newJobList;
+
+function updateJobList(newJobList) {
+	jobList = newJobList;
 }
 
-export default {      
-	job,
+export default {
 	jobList,
 	updateJobList,
-    now,  
-    isArray  
+	now,
+	isArray
 }
