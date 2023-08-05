@@ -39,18 +39,12 @@
 					<view class="week-item" v-for="item in weekList" :key="item"><text>{{item}}</text></view>
 				</view>
 				<view class="day-content" :style="{height: isOpen ? '80rpx' : 'auto'}" v-if="dayList.length > 0">
-					<!-- 背景月份 -->
-					<!-- <view class="day-item day-month" v-if="!isOpen"><text>{{month < 10 ? `0${month}` : month}}</text></view> -->
 					<view class="day-item" v-for="(item, index) in dayList" :key="index" :data-index="index"
 						@click="toActive(item, index)">
 						<text class="day-text" v-if="item.day"
 							:class="{ 'cTodayActive': item.day === day && item.today, 'actives': item.day === day, 'cToday': item.today }">
 							{{ item.today ? '今' : (item.day < 10 ? '0' + item.day : item.day) }}
 						</text>
-						<!-- 签到status true -->
-						<text class="value-text" v-if="item.data.status">{{item.data.value}}</text>
-						<!-- 未签到status false -->
-						<text class="value-text text-red" v-else>{{item.data.value}}</text>
 						<text class="day-dot" v-if="item.data.dot && item.data.active"></text>
 						<text class="day-dot dot-gray" v-if="item.data.dot && !item.data.active"></text>
 					</view>
@@ -64,23 +58,93 @@
 					</view>
 				</view>
 			</view>
-			<view>
-				<!-- <div class="divider"></div> -->
-				<!-- 胶囊tab切换 -->
-				<!-- 
-				Tyear: 2023,
-				Tmonth: 8,
-				Tday: 1,
-				TWeek: "日" 
-				-->
-				<TabSwitch :jobList="todoList" :Tyear="Tyear" :Tmonth="Tmonth" :Tday="Tday" :TWeek="TWeek" ref="tabSwitchRef"/>
+
+		</view>
+		<view class="tab-container">
+			<!-- 全选与取消 -->
+			<view class="select-buttons">
+				<button class="btn-unselect" @click="unselectAll()">全不选</button>
+				<button class="btn-cancel" @click="clickCancelSelect()">取消</button>
+			</view>
+
+			<view class="tab-buttons">
+				<button :class="{'tab-button': true, 'active': activeTab === 1}" @click="switchTab(1)">已完成</button>
+				<button :class="{'tab-button': true, 'active': activeTab === 2}" @click="switchTab(2)">未完成</button>
+			</view>
+
+			<view class="tab-content">
+				<view v-show="activeTab === 1" class="job-list" v-for="item in localjobList" :key="item">
+					<view class="color-tip" :style="{ 'background-color': item.color }"></view>
+					<view class="job-date">
+						<view class="job-day">{{item.day < 10 ? '0' + item.day : item.day}}</view>
+						<view class="job-ym">{{item.year}} {{item.month < 10 ? '0' + item.month : item.month}}</view>
+						<view class="job-week">{{item.weekday}}</view>
+					</view>
+					<view class="job-time">
+						<image class="tag-icon" src='../../static/icon/tag.png'></image>
+						{{ item.sTimeHour < 10 ? '0' + item.sTimeHour : item.sTimeHour }}:{{ item.sTimeMin < 10 ? '0' + item.sTimeMin : item.sTimeMin }}
+						-
+						{{ item.eTimeHour < 10 ? '0' + item.eTimeHour : item.eTimeHour }}:{{ item.eTimeMin < 10 ? '0' + item.eTimeMin : item.eTimeMin }}
+					</view>
+					<view class="job-mark">{{ item.mark }}</view>
+					<!-- <view class="check-icon" @tap="checkJob(item, index)"></view> -->
+					<view class="check-icon" ></view>					
+				</view>
+				<view v-show="activeTab === 2" class="job-list" v-for="(item, index) in localjobList" :key="item"
+					:class="{ 'selected': selectedJobIndexes.includes(index) }">
+					<!-- <view class="job-row"> -->
+					<view class="color-tip" :style="{ 'background-color': item.color }"></view>
+					<view class="job-date">
+						<view class="job-day">{{item.day < 10 ? '0' + item.day : item.day}}</view>
+						<view class="job-ym">{{item.year}} {{item.month < 10 ? '0' + item.month : item.month}}</view>
+						<view class="job-week">{{item.weekday}}</view>
+						<!-- {{ selectKey }} -->
+					</view>
+					<view class="job-time">
+						<image class="tag-icon" src='../../static/icon/tag.png'></image>
+						{{ item.sTimeHour < 10 ? '0' + item.sTimeHour : item.sTimeHour }}:{{ item.sTimeMin < 10 ? '0' + item.sTimeMin : item.sTimeMin }}
+						-
+						{{ item.eTimeHour < 10 ? '0' + item.eTimeHour : item.eTimeHour }}:{{ item.eTimeMin < 10 ? '0' + item.eTimeMin : item.eTimeMin }}
+					</view>
+					<view class="job-mark">{{ item.mark }}</view>
+					<view class="uncheck-icon" v-show="!item.checked" @tap="checkJob(item, index)"></view>
+					<!-- </view> -->
+					<!-- <view class="job-status">{{ item.finished ? '已完成' : '未完成' }}</view> -->
+				</view>
+			</view>
+			<button class="btn-create" @click="createItem()"></button>
+			<button class="btn-debug" @click="debug()"></button>
+		</view>
+		<!-- 任务删除-完成 -->
+		<view class="job-tools">
+			<view class="del" @tap="forSure()">
+				<image class="del-icon"></image>
+				<text>删除</text>
+			</view>
+			<view class="finish" @tap="finishJob()">
+				<image class="finish-icon"></image>
+				<text>完成</text>
 			</view>
 		</view>
+		<view>
+			<!-- <button @click="showModal">点击弹出模态框</button> -->
+
+			<view v-if="showDialog" class="modal-background">
+				<view class="modal-content">
+					<text class="asking">确定要删除此标签吗？</text>
+					<view class="for-sure-button">
+						<view class="delete-button" @click="deleteJob">删除</view>
+						<view class="cancel-button" @click="hideModal">取消</view>
+					</view>
+				</view>
+			</view>
+		</view>
+
 	</view>
 </template>
 
 <script>
-	import TabSwitch from '@/pages/zui-calendar/components/zui-calendar/TabSwitch/TabSwitch.vue';
+	// import TabSwitch from '@/pages/zui-calendar/components/zui-calendar/TabSwitch/TabSwitch.vue';
 	import saveJob from '@/pages/zui-calendar/savejob.js';
 	export default {
 		name: 'pxpDate',
@@ -88,8 +152,7 @@
 			tasklist: {
 				type: Array,
 				default: () => {
-					return [
-					]
+					return []
 				}
 			},
 			weekList: {
@@ -111,27 +174,26 @@
 				type: Array,
 				default: () => {
 					return [{
-						date: '2023-8-2',
+						date: '2023-8-1',
 						value: '签到',
 						status: true,
 						dot: true,
 						active: true
 					}, {
-						date: '2023-8-3',
+						date: '2023-8-5',
 						value: '未签到',
 						status: false,
 						dot: true,
 						active: true
 					}, {
-						date: '2023-8-4',
+						date: '2023-8-6',
 						value: '未打卡',
 						status: false,
 						dot: true,
-						active: false
+						active: true
 					}] // {date: '2020-6-3', value: '签到', dot: true, active: true}
 				}
 			},
-
 			show: {
 				type: Boolean,
 				default: false
@@ -142,50 +204,6 @@
 				default: ''
 			},
 
-			content: {
-				type: String,
-				default: '--'
-			},
-
-			confirmText: {
-				type: String,
-				default: '确认'
-			},
-
-			cancelText: {
-				type: String,
-				default: '取消'
-			},
-
-			showConfirmButton: {
-				type: Boolean,
-				default: true
-			},
-
-			showCancelButton: {
-				type: Boolean,
-				default: false
-			},
-
-			confirmColor: {
-				type: String,
-				default: '#2979ff'
-			},
-
-			cancelColor: {
-				type: String,
-				default: '#606266'
-			},
-
-			closeOnClickOverlay: {
-				type: Boolean,
-				default: true
-			},
-
-			width: {
-				type: [Number, String],
-				default: '650rpx'
-			},
 			isShrink: {
 				type: Boolean,
 				default: true
@@ -197,7 +215,10 @@
 		},
 		data() {
 			return {
+				selectedJobIndexes: [],
+				selectedJobUUid: [],
 				todoList: {},
+				showDialog: false,
 				// 接受来自子页面
 				receivedData: null,
 				dayList: [],
@@ -214,35 +235,30 @@
 				Tmonth: 8,
 				Tday: 1,
 				TWeek: "日",
-				isOpen: false
+				isOpen: false,
+				// tabSwitch
+				activeTab: 1,
+				localjobList: {},
+				selectKey: ''
 			}
 		},
-		components: {
-			TabSwitch
-		},
-		onLoad: function(option) {			
+		components: {},
+		onLoad: function(option) {
 			console.log('Pxp --------- onLoad from js---------', saveJob.jobList)
+
 			if (!option.newDay) {
 				console.log('--------- onLoad ---------')
 				return
 			}
 			// 接收来自上一页参数
-			// console.log('onLoad=========', option.newDay)
-			// console.log('onLoad=========', option.remark)
-			// console.log('onLoad=========', option.color)
-			// console.log('onLoad=========', option.shour)
-			// console.log('onLoad=========', option.ehour)
-			// console.log('onLoad=========', option.smin)
-			// console.log('onLoad=========', option.emin)
-
-			// 接收来自上一页参数
 			const newDay = option.newDay;
 
 			// 检查是否已存在该日期的记录，若不存在则创建一个新的数组
 			this.todoList = saveJob.jobList
+			console.log('新事项: ', newDay, '--------list, saveJob.jobList========', saveJob.jobList)
 			if (!this.todoList.hasOwnProperty(newDay)) {
-				console.log('############# todoList创建一个新的数组 ########')
-				this.todoList[newDay] = [];				
+				console.log('------- todoList创建一个新的数组 ########')
+				this.todoList[newDay] = [];
 			}
 
 			// 创建新的todo对象
@@ -252,13 +268,29 @@
 				sTimeMin: option.smin || '00',
 				eTimeMin: option.emin || '00',
 				mark: option.remark || '',
+				color: option.color || '2B89B8',
 				finished: false,
-				uuid: Date.now() // 时间戳作为唯一标识
+				uuid: Math.floor(Date.now() / 1000) // 时间戳作为唯一标识
 			};
+
+			this.updateTodoWithDate(todo, newDay);
 
 			// 将todo对象添加到对应日期的数组中
 			this.todoList[newDay].push(todo);
 			saveJob.updateJobList(this.todoList)
+			/*
+				toActive(item, index) {
+					this.day = item.day
+					console.log('toActive item/index, this.day', item, index, this.day)
+					this.clickActive(this.year, this.month, item.day, this.year + '-' + this.month + '-' + this.day, index)
+				}
+			*/
+			const dateStr = newDay;
+			const date = new Date(dateStr);
+			const sday = date.getDate();
+			// 光标聚焦
+			console.log('光标聚焦 debug======== this.day / sday', this.day, sday)
+			this.clickActive(this.year, this.month, sday, this.year + '-' + this.month + '-' + sday, sday)
 		},
 		created() {
 			this.isOpen = this.isUnfold
@@ -274,8 +306,114 @@
 			this.initApi(this.year, this.month)
 		},
 		methods: {
-			updateJob(y,m,d,status) {
-				this.$refs.tabSwitchRef.getDayJob(y,m,d,status);
+			showModal() {
+				this.showDialog = true;
+			},
+			hideModal() {
+				this.showDialog = false;
+			},
+			updateTodoWithDate(todo, newDay) {
+				const date = new Date(newDay);
+
+				todo.year = date.getFullYear();
+				todo.month = date.getMonth() + 1;
+				todo.day = date.getDate();
+				todo.weekday = date.toLocaleDateString('zh-CN', {
+					weekday: 'long'
+				});
+			},
+			forSure() {
+				this.showDialog = true;
+			},
+			deleteJob() {
+				console.log('执行删除标签的操作');
+				this.hideModal(); // 删除完成后隐藏模态框
+
+				if (!Array.isArray(this.selectedJobIndexes) || this.selectedJobIndexes.length === 0) {
+					console.log('nothing select')
+					return;
+				}
+
+				if (!Array.isArray(this.selectedJobUUid) || this.selectedJobUUid.length === 0) {
+					console.log('nothing select')
+					return;
+				}
+
+				console.log('点击了deleteJob, 当前选中: ', this.selectedJobIndexes);
+				console.log('点击了deleteJob, 当前选中uuid: ', this.selectedJobUUid);
+				// 删除job并且更新
+				// var temp = saveJob.jobList[this.selectKey]
+				console.log('遍历删除前 --------- localjobList:', saveJob.jobList)
+				this.selectedJobUUid.forEach(uuid => {
+					console.log('遍历删除------', uuid)
+					saveJob.removeJobElementByKeyAndUuid(this.selectKey, uuid)
+				});
+
+				console.log('遍历删除后 --------- localjobList:', saveJob.jobList)
+				this.selectedJobUUid = [];
+				// 更新事项
+				this.localjobList = saveJob.jobList[this.selectKey].filter(job => job.finished === false);
+				// 隐藏job-tool框
+				this.changeHideStatus('job-tools', 'none')
+				this.changeHideStatus('select-buttons', 'none')
+			},
+			finishJob() {
+				if (!Array.isArray(this.selectedJobIndexes) || this.selectedJobIndexes.length === 0) {
+					console.log('nothing select')
+					return;
+				}
+
+				if (!Array.isArray(this.selectedJobUUid) || this.selectedJobUUid.length === 0) {
+					console.log('nothing select')
+					return;
+				}
+				console.log('点击了finishJob, 当前选中: ', this.selectedJobIndexes);
+				console.log('点击了finishJob, 当前选中uuid: ', this.selectedJobUUid);
+
+				this.selectedJobUUid.forEach(uuid => {
+					console.log('遍历更新------', uuid)
+					saveJob.updateStatusJobElementByKeyAndUuid(this.selectKey, uuid, true)
+				});
+				this.selectedJobUUid = [];
+				console.log('遍历更新后 --------- localjobList:', saveJob.jobList)
+				// 更新事项
+				this.localjobList = saveJob.jobList[this.selectKey].filter(job => job.finished === true);
+
+				// 隐藏job-tool框
+				this.changeHideStatus('job-tools', 'none')
+				this.changeHideStatus('select-buttons', 'none')
+			},
+			debug() {
+				this.switchTab(2)
+			},
+			checkJob(item, index) {
+				console.log('checkJob ------- item: ', item)
+
+				// 展示选择栏目工具
+				this.changeHideStatus('job-tools', 'flex')
+				this.changeHideStatus('select-buttons', 'flex')
+				// 
+				item.checked = true;
+				console.log('点击了checkJob-----------', index);
+
+				const uidSelected = this.selectedJobUUid.includes(item.uuid);
+				if (uidSelected) {
+					const uidIndex = this.selectedJobUUid.indexOf(item.uuid);
+					this.selectedJobUUid.splice(uidIndex, 1);
+				} else {
+					this.selectedJobUUid.push(item.uuid);
+				}
+
+				const isSelected = this.selectedJobIndexes.includes(index);
+				if (isSelected) {
+					const selectedIndex = this.selectedJobIndexes.indexOf(index);
+					this.selectedJobIndexes.splice(selectedIndex, 1);
+				} else {
+					this.selectedJobIndexes.push(index);
+				}
+			},
+			updateJob(y, m, d, status) {
+				this.$refs.tabSwitchRef.getDayJob(y, m, d, status);
 				// this.$refs.tabSwitchRef.switchTab(2)
 			},
 			printTodoList() {
@@ -330,21 +468,21 @@
 					year,
 					month,
 					day
-				} = this.getTimeNowDate()				
+				} = this.getTimeNowDate()
 				this.year = year
 				this.month = month
 				this.day = day
-				
+
 				var wk = this.getDayOfWeek(this.Tyear, this.Tmonth, this.Tday)
 				this.Tyear = year
 				this.Tmonth = month
 				this.Tday = day
 				this.TWeek = wk
-				
+
 				// 绝对时间赋值
 				this.Ayear = year
 				this.Amonth = month
-				this.Aday = day				
+				this.Aday = day
 				this.AWeek = wk
 				console.log('### initTime 今日时间为：' + this.Tyear + '-' + this.Tmonth + '-' + this.Tday, '周', this.TWeek)
 				// TODO... 更新相应属性, 准备传递给创建页面
@@ -448,8 +586,8 @@
 						data
 					}
 					if (tflag && i === this.Aday) {
-						console.log("Pxp reset Today!")
-						console.log("Pxp 当前 Tyear/Tmonth/Tday", this.Ayear, this.Amonth, this.Aday)
+						// console.log("Pxp reset Today!")
+						// console.log("Pxp 当前 Tyear/Tmonth/Tday", this.Ayear, this.Amonth, this.Aday)
 						obj.today = true;
 					}
 					list.push(obj)
@@ -483,7 +621,7 @@
 				return dayOfWeek;
 			},
 
-			// 点击日数方法
+			// 点击日数方法, 更新job并且切换tab 默认看已完成'true'
 			clickActive(year, month, day, index) {
 				const dayOfWeek = this.getDayOfWeek(year, month, day);
 				// console.log(dayOfWeek); // 输出：星期五
@@ -493,17 +631,91 @@
 				this.Tmonth = month
 				this.Tday = day
 				this.TWeek = dayOfWeek
+				this.switchTab(1)
 				// console.log('clickActive 今日时间为：' + this.Tyear + '-' + this.Tmonth + '-' +this.Tday )
 				// TODO 默认看已完成'true'
-				this.updateJob(this.Tyear, this.Tmonth, this.Tday, false);
+				// this.updateJob(this.Tyear, this.Tmonth, this.Tday, false);
 			},
 
 			// 全选
 			selectAll(event) {
-				// 在这里编写点击事件的处理逻辑
 				console.log('点击了全选');
-				// 触发自定义事件，通知子页面隐藏 tab-buttons
-				uni.$emit('hideTabButtons');
+				// 显示选择操作栏
+				var selectButtons = document.querySelector('.select-buttons');
+				selectButtons.style.display = 'flex';
+			},
+
+			// tab-switch method
+			getDayJob(y, m, d, status) {
+				// 转换样式
+				if (status) {
+					// console.log('activeTab = 1')
+					this.activeTab = 1;
+				} else {
+					// console.log('activeTab = 2')
+					this.activeTab = 2
+				}
+				this.selectKey = y + '/' + m + '/' + d;
+				if (saveJob.jobList.hasOwnProperty(this.selectKey)) {
+					console.log('pxp================查找key', this.selectKey, ',status ', status)
+					console.log('pxp============当前所有状态:', saveJob.jobList)
+					// this.localjobList = saveJob.jobList[selectKey]
+					this.localjobList = saveJob.jobList[this.selectKey].filter(job => job.finished === status);
+					console.log('getDayJob, found: ', this.selectKey, 'with value: ', this.localjobList,
+						'finished status: ',
+						status)
+				} else {
+					console.log('getDayJob, not found: ', this.selectKey)
+					this.localjobList = []
+				}
+			},
+			switchTab(tabIndex) {
+				// :jobList="todoList" :ddList="ddList" :Tyear="Tyear" :Tmonth="Tmonth" :Tday="Tday" :TWeek="TWeek"
+				// this.selectKey = this.Tyear + '/' + this.Tmonth + '/' + this.Tday;
+				this.activeTab = tabIndex;
+				if (tabIndex === 1) {
+					this.getDayJob(this.Tyear, this.Tmonth, this.Tday, true);
+				} else {
+					this.getDayJob(this.Tyear, this.Tmonth, this.Tday, false);
+				}
+				console.log('switchTab, index: ', tabIndex)
+			},
+			changeHideStatus(className, displayValue) {
+				var elements = document.querySelectorAll('.' + className);
+				for (var i = 0; i < elements.length; i++) {
+					elements[i].style.display = displayValue;
+				}
+			},
+			unselectAll() {
+				console.log('click unselect')
+				this.selectedJobIndexes = [];
+				this.selectedJobUUid = [];
+				this.changeHideStatus('job-tools', 'none')
+				this.changeHideStatus('select-buttons', 'none')
+				for (let item of this.localjobList) {
+					item.checked = false;
+				}
+			},
+			clickCancelSelect() {
+				console.log('click unselect')
+				this.selectedJobIndexes = [];
+				this.selectedJobUUid = [];
+				this.changeHideStatus('job-tools', 'none')
+				this.changeHideStatus('select-buttons', 'none')
+				for (let item of this.localjobList) {
+					item.checked = false;
+				}
+			},
+			createItem() {
+				console.log('Todo pass newItem, 目标天:', this.Tyear, this.Tmonth, this.Tday, '周', this.TWeek)
+				const Tyear = this.Tyear;
+				uni.navigateTo({
+					url: '/pages/zui-calendar/components/zui-calendar/newItem/newItem' +
+						'?Tyear=' + this.Tyear +
+						'&Tmonth=' + this.Tmonth +
+						'&Tday=' + this.Tday +
+						'&Tweek=' + this.TWeek
+				});
 			},
 
 			// 点击任务方法
@@ -516,6 +728,7 @@
 
 			toActive(item, index) {
 				this.day = item.day
+				// console.log('toActive item/index, this.day', item, index, this.day)
 				this.clickActive(this.year, this.month, item.day, this.year + '-' + this.month + '-' + this.day, index)
 			},
 
@@ -737,7 +950,7 @@
 				// margin-left: 3rpx;
 				text-align: center;
 				font-size: 28rpx;
-				border-radius: 14rpx;
+				border-radius: 6px;
 				// border: 1px solid #000000; 
 				background-color: #F5C8D0;
 			}
@@ -904,167 +1117,354 @@
 			}
 		}
 
-		.task-box {
-			display: flex;
-			flex-direction: column;
-
-			.task-item {
-				display: flex;
-				flex-direction: row;
-				align-items: center;
-				justify-content: space-between;
-				background-color: white;
-				padding: 20rpx;
-				box-sizing: border-box;
-				border-radius: 10rpx;
-				margin-bottom: 20rpx;
-
-				.avatar-box {
-					display: flex;
-
-					.avatar {
-						width: 100rpx;
-						height: 100rpx;
-						margin-right: 20rpx;
-						border-radius: 50%;
-
-						image {
-							width: 100rpx;
-							height: 100rpx;
-							border-radius: 50%;
-						}
-					}
-
-					.title-box {
-						display: flex;
-						flex-direction: column;
-						align-content: space-between;
-
-						.title {
-							font-size: 30rpx;
-							color: #8f9298;
-							margin-bottom: 15rpx;
-						}
-
-						.date {
-							font-size: 26rpx;
-							color: #909193;
-
-							.branch {
-								margin-right: 15rpx;
-							}
-						}
-					}
-				}
-			}
-		}
 	}
 
-	.modal {
+	// tab-switch start
+	.select-buttons {
+		display: none;
+		justify-content: center;
+		align-items: center;
+		width: 100%;
+		height: 1%;
+		/* border-radius: 10px; */
+		// background-color: #c8ff46;
+		margin-bottom: 10px;
+	}
+
+	.btn-unselect {
+		font-size: 24rpx;
+		position: relative;
+		right: 120rpx;
+		border: none;
+		/* 取消边框 */
+		color: #be7b95;
+	}
+
+	.btn-cancel {
+		font-size: 24rpx;
+		position: relative;
+		border: none;
+		/* 取消边框 */
+		left: 120rpx;
+	}
+
+	.btn-create {
+		background-image: url('../../static/icon/create.png');
+		background-size: contain;
+		background-repeat: no-repeat;
+		width: 55px;
+		height: 55px;
+		position: fixed;
+		border: none;
+		border-radius: 50%;
+		top: 80%;
+		left: 80%;
+	}
+
+	.btn-debug {
+		display: none;
+		background-image: url('../../static/icon/delete.png');
+		background-size: contain;
+		background-repeat: no-repeat;
+		width: 55px;
+		height: 55px;
+		position: fixed;
+		border: none;
+		border-radius: 50%;
+		top: 80%;
+		right: 80%;
+	}
+
+	.job-tools {
+		display: none;
+		background-color: #ffffff;
+		border: 1px solid #b8b8b8;
+		border-radius: 6px;
+		position: fixed;
+		top: 87%;
+		left: 1.4%;
+		width: 95%;
+		height: 40px;
+	}
+
+	.del {
+		display: flex;
+		align-items: center;
+		// background-color: #913bf3;
+		width: 20%;
+		height: 25px;
+		position: relative;
+		margin: auto;
+	}
+
+	.del-icon {
+		padding-left: 5px;
+		width: 25px;
+		height: 25px;
+		background-image: url('../../static/icon/delete.png');
+		background-size: contain;
+		background-repeat: no-repeat;
+	}
+
+	.finish {
+		display: flex;
+		align-items: center;
+		width: 20%;
+		height: 25px;
+		// background-color: #ccf392;
+		position: relative;
+		margin: auto;
+	}
+
+	.finish-icon {
+		padding-left: 5px;
+		width: 25px;
+		height: 25px;
+		background-image: url('../../static/icon/finished.png');
+		background-size: contain;
+		background-repeat: no-repeat;
+	}
+
+	.tab-container {
+		position: relative;
+		top: 20rpx;
+		width: 100%;
+		height: 100%;
+		// background-color: #55ff17;
 		display: flex;
 		flex-direction: column;
-		flex: 1;
-
-		.mask {
-			transition-duration: 450ms;
-			transition-timing-function: ease-out;
-			position: fixed;
-			inset: 0px;
-			z-index: 10070;
-			background-color: rgba(0, 0, 0, 0.5);
-		}
-
-		.z-content {
-			z-index: 10075;
-			position: fixed;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			inset: 0px;
-
-			.modal-content {
-				border-radius: 6px;
-				overflow: hidden;
-				margin-top: 0px;
-				/* height: 200px; */
-				background-color: #fff;
-				position: relative;
-
-				.z-modal {
-					width: 289px;
-					border-radius: 6px;
-					overflow: hidden;
-
-					.modal-title {
-						font-size: 16px;
-						font-weight: 700;
-						color: #606266;
-						text-align: center;
-						padding-top: 25px;
-					}
-
-					.z-modal-content {
-						padding: 12px 25px 25px 25px;
-						display: flex;
-						flex-direction: row;
-						justify-content: center;
-						font-size: 15px;
-						color: #606266;
-					}
-
-					.line {
-						margin: 0px;
-						border-bottom: 1px solid rgb(214, 215, 217);
-						width: 100%;
-						transform: scaleY(0.5);
-						border-top-color: rgb(214, 215, 217);
-						border-right-color: rgb(214, 215, 217);
-						border-left-color: rgb(214, 215, 217);
-						vertical-align: middle;
-					}
-
-					.modal-foot {
-						display: flex;
-						flex-direction: row;
-						font-size: 16px;
-						text-align: center;
-						color: rgb(96, 98, 102);
-
-						.cancel {
-							flex: 1;
-							display: flex;
-							flex-direction: row;
-							justify-content: center;
-							align-items: center;
-							height: 48px;
-						}
-
-						.foot-line {
-							margin: 0px;
-							border-left: 1px solid rgb(214, 215, 217);
-							height: 48px;
-							transform: scaleX(0.5);
-							border-top-color: rgb(214, 215, 217);
-							border-right-color: rgb(214, 215, 217);
-							border-bottom-color: rgb(214, 215, 217);
-						}
-
-						.confirm {
-							flex: 1;
-							display: flex;
-							flex-direction: row;
-							justify-content: center;
-							align-items: center;
-							height: 48px;
-
-							text {
-								color: rgb(41, 121, 255);
-							}
-						}
-					}
-				}
-
-			}
-		}
+		align-items: center;
+		/* margin-top: 10px; */
 	}
+
+	.tab-buttons {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 96%;
+		height: 1.3%;
+		border-radius: 10px;
+		background-color: #f4c8d0;
+		margin-bottom: 10px;
+	}
+
+	.tab-button {
+		color: #8d4057;
+		font-size: 24rpx;
+		/* font-weight: bolder; */
+		flex: 1;
+		border-radius: 10px;
+		/* padding: 10px 20px; */
+		border: none;
+		outline: none;
+		background-color: transparent;
+		/* cursor: pointer; */
+	}
+
+	.tab-button.active {
+		background-color: #FCEDFA;
+		color: #8d4057;
+		border: none;
+		outline: none;
+		border-radius: 10px;
+	}
+
+	.tab-content {
+		width: 100%;
+		/* background-color: #0d1fb9; */
+		/* display: flex; */
+		display: flex;
+		flex-direction: column;
+		/* justify-content: center; */
+		align-items: center;
+	}
+
+	.job-list {
+		background-color: #f2f2f3;
+		/* border: 2px solid #cf6011; */
+		display: flex;
+		border-radius: 6%;
+		border-radius: 10px / 20px;
+		margin-top: 5px;
+		margin-bottom: 5px;
+		position: relative;
+		width: 95%;
+		height: 120px;
+		// text-align: center;
+		font-size: 30px;
+		/* 星期几标识 */
+		/* color: #18b557; */
+	}
+
+	.selected {
+		border: 2px solid #b5441f;
+		/* 自定义边框样式 */
+	}
+
+	.uncheck-icon {
+		background-image: url('../../static/icon/uncheck-1.png');
+		background-repeat: no-repeat;
+		background-size: cover;
+		position: absolute;
+		right: 30px;
+		top: 40px;
+		width: 24px;
+		height: 25px;
+	}
+	
+	.check-icon {
+		background-image: url('../../static/icon/uncheck.png');
+		background-repeat: no-repeat;
+		background-size: cover;
+		position: absolute;
+		right: 30px;
+		top: 40px;
+		width: 24px;
+		height: 25px;
+	}
+
+	.color-tip {
+		background-color: #6487FF;
+		width: 148rpx;
+		height: 100%;
+		border-top-left-radius: 10px;
+		border-bottom-left-radius: 10px;
+		position: relative;
+		top: 0rpx;
+		left: 0rpx;
+	}
+
+	.job-mark {
+		// background-color: #ca5cf5;
+		color: #1a1a1a;
+		font-family: 'Courier New', Courier, monospace;
+		font-size: 15px;
+		position: relative;
+		width: 290px;
+		height: 40px;
+		top: 98rpx;
+		right: 113px;
+	}
+
+	.job-date {
+		/* background-color: #b99926; */
+		width: 180px;
+		height: 30px;
+		display: flex;
+		position: relative;
+		top: 17px;
+		left: 20px;
+	}
+
+	/* 
+			<view class="job-day"></view>
+			<view class="job-ym"></view>
+			<view class="job-week"></view>
+		 */
+	.job-day {
+		/* background-color: #b94167; */
+		width: 70rpx;
+		height: 70rpx;
+		font-size: 30px;
+		position: relative;
+		top: 10rpx;
+		left: 12rpx;
+	}
+
+	.job-ym {
+		/* background-color: #fae543; */
+		width: 140rpx;
+		height: 60rpx;
+		position: relative;
+		font-size: 14px;
+		top: 10rpx;
+		left: 17rpx;
+	}
+
+	.job-week {
+		/* background-color: #b94b2f; */
+		width: 90rpx;
+		height: 60rpx;
+		font-size: 14px;
+		position: relative;
+		top: 54rpx;
+		right: 110rpx;
+	}
+
+	.job-time {
+		display: flex;
+		// background-color: #50f563;
+		position: relative;
+		color: #1a1a1a;
+		width: 540px;
+		height: 50px;
+		top: 19px;
+		padding-left: 0px;
+		font-size: 16px;
+	}
+
+	.tag-icon {
+		position: relative;
+		top: 3px;
+		right: 9px;
+		width: 15px;
+		height: 15px;
+	}
+
+	.modal-background {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: rgba(0, 0, 0, 0.5);
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.modal-content {
+		position: absolute;
+		display: flex;
+		/* 将 .modal-content 设置为弹性容器 */
+		flex-direction: column;
+		/* 确保子元素垂直排列 */
+		align-items: center;
+		/* 子元素在主轴上居中 */
+		top: 55%;
+		width: 260px;
+		height: 160px;
+		padding: 20px;
+		background-color: #fff;
+		border-radius: 20px;
+	}
+
+	.asking {
+		position: relative;
+		font-weight: bold;
+		top: 20px;
+	}
+
+	.for-sure-button {
+		display: block;
+		justify-content: center;
+		margin-top: 50px;
+	}
+
+	.delete-button {
+		// background-color: red;
+		color: #d0a5b1;
+		padding: 10px 20px;
+		border-radius: 5px;
+		margin-right: 10px;
+	}
+
+	.cancel-button {
+		// background-color: #ddd;
+		color: #d0a5b1;
+		padding: 10px 20px;
+		border-radius: 5px;
+	}
+
+	// tab-switch end
 </style>
