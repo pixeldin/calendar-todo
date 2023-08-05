@@ -125,6 +125,7 @@
 
 <script>
 	import TabSwitch from '@/pages/zui-calendar/components/zui-calendar/TabSwitch/TabSwitch.vue';
+	import saveJob from '@/pages/zui-calendar/savejob.js';
 	export default {
 		name: 'pxpDate',
 		props: {
@@ -315,26 +316,29 @@
 			TabSwitch
 		},
 		onLoad: function(option) {
+			console.log('Pxp --------- onLoad from js---------', saveJob.job)
+			console.log('Pxp --------- onLoad from js---------', saveJob.jobList)
 			if (!option.newDay) {
 				console.log('--------- onLoad ---------')
 				return
 			}
 			// 接收来自上一页参数
-			console.log('onLoad=========', option.newDay)
-			console.log('onLoad=========', option.remark)
-			console.log('onLoad=========', option.color)
-			console.log('onLoad=========', option.shour)
-			console.log('onLoad=========', option.ehour)
-			console.log('onLoad=========', option.smin)
-			console.log('onLoad=========', option.emin)
+			// console.log('onLoad=========', option.newDay)
+			// console.log('onLoad=========', option.remark)
+			// console.log('onLoad=========', option.color)
+			// console.log('onLoad=========', option.shour)
+			// console.log('onLoad=========', option.ehour)
+			// console.log('onLoad=========', option.smin)
+			// console.log('onLoad=========', option.emin)
 
 			// 接收来自上一页参数
 			const newDay = option.newDay;
 
 			// 检查是否已存在该日期的记录，若不存在则创建一个新的数组
+			this.todoList = saveJob.jobList
 			if (!this.todoList.hasOwnProperty(newDay)) {
 				console.log('############# todoList创建一个新的数组 ########')
-				this.todoList[newDay] = [];
+				this.todoList[newDay] = [];				
 			}
 
 			// 创建新的todo对象
@@ -350,6 +354,7 @@
 
 			// 将todo对象添加到对应日期的数组中
 			this.todoList[newDay].push(todo);
+			saveJob.updateJobList(option.remark, this.todoList)
 		},
 		created() {
 			this.isOpen = this.isUnfold
@@ -366,7 +371,7 @@
 		},
 		methods: {
 			printTodoList() {
-				console.log(todoList)
+				console.log(this.todoList)
 				for (const key in this.todoList) {
 					if (this.todoList.hasOwnProperty(key)) {
 						console.log(`日期：${key}`);
@@ -591,6 +596,7 @@
 				this.ddList.splice(1, 1, 'Two')
 				this.ddList.splice(3, 1, 'Thursday')
 
+				console.log('--------- clickTask job from js---------', saveJob.job)
 				this.printTodoList()
 			},
 
