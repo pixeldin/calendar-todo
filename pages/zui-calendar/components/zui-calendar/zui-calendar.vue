@@ -1,5 +1,6 @@
 <template>
 	<view>
+		<view class="top-loc"></view>
 		<view class="date-box">
 			<view class="top-tools" :style="{ display: isOpen ? 'block' : 'none' }">
 				<text
@@ -73,7 +74,8 @@
 			</view>
 
 			<view class="tab-content">
-				<view v-show="activeTab === 1" class="job-list" v-for="item in localjobList" :key="item">
+				<view v-show="activeTab === 1" class="job-list" v-for="(item, index) in localjobList" :key="item"
+					:class="{ 'selected': selectedJobIndexes.includes(index) }" @tap="checkJob(item, index)">
 					<view class="color-tip" :style="{ 'background-color': item.color }"></view>
 					<view class="job-date">
 						<view class="job-day">{{item.day < 10 ? '0' + item.day : item.day}}</view>
@@ -88,15 +90,16 @@
 					</view>
 					<view class="job-mark">{{ item.mark }}</view>
 					<!-- <view class="check-icon" @tap="checkJob(item, index)"></view> -->
-					<view class="check-icon" ></view>					
+					<view class="check-icon"></view>
 				</view>
 				<view v-show="activeTab === 2" class="job-list" v-for="(item, index) in localjobList" :key="item"
-					:class="{ 'selected': selectedJobIndexes.includes(index) }">
+					:class="{ 'selected': selectedJobIndexes.includes(index) }" @tap="checkJob(item, index)">
 					<!-- <view class="job-row"> -->
 					<view class="color-tip" :style="{ 'background-color': item.color }"></view>
 					<view class="job-date">
 						<view class="job-day">{{item.day < 10 ? '0' + item.day : item.day}}</view>
-						<view class="job-ym">{{item.year}} {{item.month < 10 ? '0' + item.month : item.month}}</view>
+						<view class="job-ym">{{item.year}} {{item.month < 10 ? '0' + item.month : item.month}}
+						</view>
 						<view class="job-week">{{item.weekday}}</view>
 						<!-- {{ selectKey }} -->
 					</view>
@@ -107,7 +110,9 @@
 						{{ item.eTimeHour < 10 ? '0' + item.eTimeHour : item.eTimeHour }}:{{ item.eTimeMin < 10 ? '0' + item.eTimeMin : item.eTimeMin }}
 					</view>
 					<view class="job-mark">{{ item.mark }}</view>
-					<view class="uncheck-icon" v-show="!item.checked" @tap="checkJob(item, index)"></view>
+					<!-- <view class="uncheck-icon" v-show="!item.checked" @tap="checkJob(item, index)"></view> -->
+					<view class="uncheck-icon"></view>
+
 					<!-- </view> -->
 					<!-- <view class="job-status">{{ item.finished ? '已完成' : '未完成' }}</view> -->
 				</view>
@@ -215,6 +220,7 @@
 		},
 		data() {
 			return {
+				// selectAll: false,
 				selectedJobIndexes: [],
 				selectedJobUUid: [],
 				todoList: {},
@@ -353,6 +359,7 @@
 				this.selectedJobUUid = [];
 				// 更新事项
 				this.localjobList = saveJob.jobList[this.selectKey].filter(job => job.finished === false);
+				this.switchTab(2)
 				// 隐藏job-tool框
 				this.changeHideStatus('job-tools', 'none')
 				this.changeHideStatus('select-buttons', 'none')
@@ -375,10 +382,12 @@
 					saveJob.updateStatusJobElementByKeyAndUuid(this.selectKey, uuid, true)
 				});
 				this.selectedJobUUid = [];
+				this.selectedJobIndexes = [];
 				console.log('遍历更新后 --------- localjobList:', saveJob.jobList)
 				// 更新事项
 				this.localjobList = saveJob.jobList[this.selectKey].filter(job => job.finished === true);
 
+				this.switchTab(1)
 				// 隐藏job-tool框
 				this.changeHideStatus('job-tools', 'none')
 				this.changeHideStatus('select-buttons', 'none')
@@ -640,9 +649,15 @@
 			// 全选
 			selectAll(event) {
 				console.log('点击了全选');
+				// 展示选择栏目工具
+				this.changeHideStatus('job-tools', 'flex')
+				this.changeHideStatus('select-buttons', 'flex')
 				// 显示选择操作栏
 				var selectButtons = document.querySelector('.select-buttons');
 				selectButtons.style.display = 'flex';
+				// 全选，将 localjobList 中所有项的索引和对应的 uuid 添加到 selectedJobIndexes 和 selectedJobUUid
+				this.selectedJobIndexes = this.localjobList.map((item, index) => index);
+				this.selectedJobUUid = this.localjobList.map(item => item.uuid);
 			},
 
 			// tab-switch method
@@ -814,6 +829,13 @@
 		display: none;
 	}
 
+	.top-loc {
+		width: 100%;
+		height: 52rpx;
+		// background-color: #00ff7f;
+		background-color: #FCEDFA;
+	}
+
 	.date-box {
 		display: flex;
 		flex-direction: column;
@@ -824,7 +846,7 @@
 			width: 100%;
 			height: 80rpx;
 			color: #b46274;
-			/* background-color: #1467cc; */
+			// background-color: #1467cc;
 			background-color: #FCEDFA;
 			padding: 10rpx 20rpx;
 			position: relative;
@@ -887,11 +909,10 @@
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-				// padding: 20rpx 180rpx;
 
 				padding-left: 210rpx;
 				padding-right: 200rpx;
-				padding-top: 18rpx;
+				padding-top: 38rpx;
 				padding-bottom: 20rpx;
 
 				/* margin-left: auto;
@@ -929,7 +950,7 @@
 				// position: relative;
 				// align-items: center;
 				justify-content: space-between;
-				top: 112rpx;
+				top: 172rpx;
 				// left: 1%;
 				width: 95%;
 				height: 165rpx;
@@ -963,7 +984,7 @@
 				flex: 1;
 				// padding-top: 10rpx;
 				padding-bottom: 3rpx;
-				padding-top: 28rpx;
+				padding-top: 32rpx;
 				padding-right: 15rpx;
 				padding-left: 15rpx;
 				border-bottom: 1rpx solid #f3f4f6;
@@ -1289,7 +1310,7 @@
 		margin-bottom: 5px;
 		position: relative;
 		width: 95%;
-		height: 120px;
+		height: 100px;
 		// text-align: center;
 		font-size: 30px;
 		/* 星期几标识 */
@@ -1311,7 +1332,7 @@
 		width: 24px;
 		height: 25px;
 	}
-	
+
 	.check-icon {
 		background-image: url('../../static/icon/uncheck.png');
 		background-repeat: no-repeat;
@@ -1325,7 +1346,7 @@
 
 	.color-tip {
 		background-color: #6487FF;
-		width: 148rpx;
+		width: 163rpx;
 		height: 100%;
 		border-top-left-radius: 10px;
 		border-bottom-left-radius: 10px;
@@ -1421,6 +1442,7 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		z-index: 999;
 	}
 
 	.modal-content {

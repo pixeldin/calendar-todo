@@ -563,6 +563,7 @@
 	}
 
 	.pxp-card-top {
+		padding-top: 20px;
 		height: 55px;
 		width: 100%;
 		background-color: #ffffff;
@@ -772,17 +773,17 @@
 		position: relative;
 		width: 75%;
 		height: 20%;
-		top: 22%;
+		top: 20%;
 		left: 19%;
 		display: flex;
 		justify-content: center;
 	}
 
 	.color-circle {
-		width: 20px;
-		height: 20px;
+		width: 23px;
+		height: 23px;
 		border-radius: 50%;
-		margin: 0 5px;
+		margin: 0 7rpx;
 		cursor: pointer;
 	}
 

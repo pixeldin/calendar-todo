@@ -52,13 +52,13 @@ var jobList = {
 	"2023/8/6": [{
 		"color": "#FF9903",
 		"day": 6,
-		"eTimeHour": "0",
-		"eTimeMin": "3",
+		"eTimeHour": "23",
+		"eTimeMin": "59",
 		"finished": false,
 		"mark": "写代码!",
 		"month": 8,
-		"sTimeHour": "23",
-		"sTimeMin": "55",
+		"sTimeHour": "0",
+		"sTimeMin": "5",
 		"uuid": 1691244487,
 		"weekday": "星期日",
 		"year": 2023
