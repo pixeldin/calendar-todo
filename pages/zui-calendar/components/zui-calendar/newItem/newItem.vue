@@ -39,7 +39,9 @@
 					<span>{{ weekItems['周日'].name }}</span>
 				</view>
 				<view class="pxp-week-item" style="visibility: hidden">
-					<image class="icon" src='../../../static/icon/unselect-week.png'></image>
+					<image class="icon"
+						src='https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/unselect-week.png'>
+					</image>
 					<span>周八</span>
 				</view>
 			</view>
@@ -161,8 +163,8 @@
 		data() {
 			return {
 				// 来自日历天
-				selectDay: '',
-				selectWeekDay: '',
+				selectDay: '2023/8/1',
+				selectWeekDay: '二',
 				colorArray: ["#5FBFFF", "#DD5C5C", "#FF9A02", "#B347FF", "#79BB31", "#38B576", "#6488FF", "#9896FF",
 					"#C4C4C4",
 					"#9933CC"
@@ -178,44 +180,45 @@
 				emin: 0,
 				shakebtn: {
 					'0': {
-						iconUrl: '../../../static/icon/btn-unclick.png',
+						// iconUrl: '../../../static/icon/btn-unclick.png',
+						iconUrl: 'https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/btn-unclick.png',
 						selected: false
 					}
 				},
 				weekItems: {
 					'周一': {
 						name: '周一',
-						iconUrl: '../../../static/icon/unselect-week.png',
+						iconUrl: 'https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/unselect-week.png',
 						selected: false
 					},
 					'周二': {
 						name: '周二',
-						iconUrl: '../../../static/icon/unselect-week.png',
+						iconUrl: 'https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/unselect-week.png',
 						selected: false
 					},
 					'周三': {
 						name: '周三',
-						iconUrl: '../../../static/icon/unselect-week.png',
+						iconUrl: 'https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/unselect-week.png',
 						selected: false
 					},
 					'周四': {
 						name: '周四',
-						iconUrl: '../../../static/icon/unselect-week.png',
+						iconUrl: 'https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/unselect-week.png',
 						selected: false
 					},
 					'周五': {
 						name: '周五',
-						iconUrl: '../../../static/icon/unselect-week.png',
+						iconUrl: 'https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/unselect-week.png',
 						selected: false
 					},
 					'周六': {
 						name: '周六',
-						iconUrl: '../../../static/icon/unselect-week.png',
+						iconUrl: 'https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/unselect-week.png',
 						selected: false
 					},
 					'周日': {
 						name: '周日',
-						iconUrl: '../../../static/icon/unselect-week.png',
+						iconUrl: 'https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/unselect-week.png',
 						selected: false
 					}
 				},
@@ -239,10 +242,9 @@
 			}
 		},
 		onLoad: function(option) {
+			this.selectDay = option.selectDay || '2023/8/1';
+			this.selectWeekDay = option.selectWeekDay || '二';
 			// 接收来自上一页参数
-			this.selectDay = option.Tyear + '/' + option.Tmonth + '/' + option.Tday
-			this.selectWeekDay = option.Tweek
-			console.log('onLoad------', option.Tyear, option.Tmonth, option.Tday, option.Tweek);
 		},
 		watch: {
 			hours(newVal) {
@@ -279,8 +281,9 @@
 		},
 		computed: {
 			btnBackground() {
-				return this.showIcon ? 'url(../../../static/icon/btn-clicked.png)' :
-					'url(../../../static/icon/btn-unclick.png)';
+				return this.showIcon ?
+					'url(https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/btn-clicked.png)' :
+					'url(https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/btn-unclick.png)';
 			},
 			hours() {
 				return this.getCurrentRange('hour')
@@ -506,10 +509,12 @@
 			toggleCheckbox(weekDay) {
 				this.weekItems[weekDay].selected = !this.weekItems[weekDay].selected;
 				if (this.weekItems[weekDay].selected) {
-					this.weekItems[weekDay].iconUrl = '../../../static/icon/select-week.png';
+					this.weekItems[weekDay].iconUrl =
+						'https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/select-week.png';
 					// console.log(weekDay + '被选中');
 				} else {
-					this.weekItems[weekDay].iconUrl = '../../../static/icon/unselect-week.png';
+					this.weekItems[weekDay].iconUrl =
+						'https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/unselect-week.png';
 					// console.log(weekDay + '被取消选中');
 				}
 				// 获取当前选中的所有周天
@@ -520,10 +525,12 @@
 				console.log('toggleIcon click');
 				this.shakebtn[id].selected = !this.shakebtn[id].selected;
 				if (this.shakebtn[id].selected) {
-					this.shakebtn[id].iconUrl = '../../../static/icon/btn-clicked.png';
+					this.shakebtn[id].iconUrl =
+						'https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/btn-clicked.png';
 					console.log('打开震动 来自日历:::', this.$route.params.id);
 				} else {
-					this.shakebtn[id].iconUrl = '../../../static/icon/btn-unclick.png';
+					this.shakebtn[id].iconUrl =
+						'https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/btn-unclick.png';
 					console.log('取消震动');
 				}
 			},
@@ -542,7 +549,7 @@
 				// 传递当前数据过去
 				uni.navigateTo({
 					url: '/pages/zui-calendar/components/zui-calendar/zui-calendar?' +
-						'newDay=' +  this.selectDay +
+						'newDay=' + this.selectDay +
 						'&remark=' + this.remark +
 						'&color=' + this.colorArray[this.selectedColorIndex] +
 						'&shour=' + this.shour +
@@ -743,7 +750,7 @@
 	}
 
 	.tip-icon {
-		background-image: url('../../../static/icon/down-tip.png');
+		background-image: url('https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/down-tip.png');
 		background-size: contain;
 		background-repeat: no-repeat;
 		width: 12px;
@@ -788,27 +795,20 @@
 	}
 
 	.active {
-		background-image: url('../../../static/icon/color-select.png');
+		background-image: url('https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/color-select.png');
 		background-size: contain;
 		background-repeat: no-repeat;
 	}
 
 	$uni-primary: #007aff !default;
 
-	.uni-datetime-picker {
-		/* #ifndef APP-NVUE */
-		/* width: 100%; */
-		/* #endif */
-	}
+	.uni-datetime-picker {}
 
 	.uni-datetime-picker-view {
 		height: 130px;
 		// 选择器宽度
 		width: 180px;
 		// opacity: 0.78;
-		/* #ifndef APP-NVUE */
-		cursor: pointer;
-		/* #endif */
 	}
 
 	.uni-datetime-picker-view-end {
@@ -816,9 +816,6 @@
 		// 选择器宽度
 		width: 180px;
 		// opacity: 0.78;
-		/* #ifndef APP-NVUE */
-		cursor: pointer;
-		/* #endif */
 	}
 
 	.uni-datetime-picker-item {
@@ -832,10 +829,6 @@
 
 	.uni-datetime-picker-btn {
 		margin-top: 60px;
-		/* #ifndef APP-NVUE */
-		display: flex;
-		cursor: pointer;
-		/* #endif */
 		flex-direction: row;
 		justify-content: space-between;
 	}
@@ -846,9 +839,6 @@
 	}
 
 	.uni-datetime-picker-btn-group {
-		/* #ifndef APP-NVUE */
-		display: flex;
-		/* #endif */
 		flex-direction: row;
 	}
 
@@ -897,11 +887,7 @@
 
 	/* pxp diy e*/
 
-	.fix-nvue-height {
-		/* #ifdef APP-NVUE */
-		height: 330px;
-		/* #endif */
-	}
+	.fix-nvue-height {}
 
 	.uni-datetime-picker-time {
 		color: grey;
@@ -916,24 +902,13 @@
 		// border: 1px solid #E5E5E5;
 		border-radius: 5px;
 		padding: 7px 10px;
-		/* #ifndef APP-NVUE */
-		box-sizing: border-box;
-		cursor: pointer;
-		/* #endif */
 	}
 
-	.uni-datetime-picker-timebox-pointer {
-		/* #ifndef APP-NVUE */
-		cursor: pointer;
-		/* #endif */
-	}
+	.uni-datetime-picker-timebox-pointer {}
 
 
 	.uni-datetime-picker-disabled {
 		opacity: 0.4;
-		/* #ifdef H5 */
-		cursor: not-allowed !important;
-		/* #endif */
 	}
 
 	.uni-datetime-picker-text {
@@ -980,7 +955,7 @@
 	}
 
 	.btn-start {
-		background-image: url('../../../static/icon/time-setting.png');
+		background-image: url('https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/time-setting.png');
 		background-size: contain;
 		background-repeat: no-repeat;
 		position: relative;
@@ -994,7 +969,7 @@
 	}
 
 	.btn-end {
-		background-image: url('../../../static/icon/time-setting.png');
+		background-image: url('https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/time-setting.png');
 		background-size: contain;
 		background-repeat: no-repeat;
 		border: none;

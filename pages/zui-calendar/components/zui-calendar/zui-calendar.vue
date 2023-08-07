@@ -10,18 +10,18 @@
 					<text class="brief-title">{{year}} {{ month < 10 ? '0' + month : month }} 星期{{TWeek}}</text>
 				</view>
 				<view class="down-tip"></view>
-				<view class="select-all" @tap="selectAll"></view>
+				<view class="select-all" @click="selectAll"></view>
 			</view>
 			<view class="box-list" :style="{'margin-bottom' : tasklist.length > 0 ? '20rpx' : '0'}">
 				<!-- 收缩隐藏 -->
 				<view class="date-top" :style="{ display: isOpen ? 'none' : 'block' }">
 					<view class="conter-text">
-						<view class="icon left-icon" @click="LastMonth">
-							<view class="iconfont icon-arrow-left"></view>
+						<view class="left-icon" @click="LastMonth">
+							<view class=""></view>
 						</view>
 						<text class="day-title">{{year}}年{{month}}月{{day}}日</text>
-						<view class="icon rigth-icon" @click="NextMonth">
-							<view class="iconfont icon-arrow-right"></view>
+						<view class="right-icon" @click="NextMonth">
+							<view class=""></view>
 						</view>
 					</view>
 				</view>
@@ -52,10 +52,10 @@
 				</view>
 				<view style="width: 100%;" v-if="isShrink">
 					<view class="toggle" v-if="isOpen" @click="toStretch">
-						<view class="iconfont icon-stretch"></view>
+						<image src="https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/down.png" class="icon-down"></image>
 					</view>
 					<view class="toggle" v-else @click="toShrink">
-						<view class="iconfont icon-merge"></view>
+						<image src="https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/up.png" class="icon-up"></image>
 					</view>
 				</view>
 			</view>
@@ -75,7 +75,7 @@
 
 			<view class="tab-content">
 				<view v-show="activeTab === 1" class="job-list" v-for="(item, index) in localjobList" :key="item"
-					:class="{ 'selected': selectedJobIndexes.includes(index) }" @tap="checkJob(item, index)">
+					:class="{ 'selected': selectedJobIndexes.includes(index) }" @click="checkJob(item, index)">
 					<view class="color-tip" :style="{ 'background-color': item.color }"></view>
 					<view class="job-date">
 						<view class="job-day">{{item.day < 10 ? '0' + item.day : item.day}}</view>
@@ -83,17 +83,17 @@
 						<view class="job-week">{{item.weekday}}</view>
 					</view>
 					<view class="job-time">
-						<image class="tag-icon" src='../../static/icon/tag.png'></image>
+						<image class="tag-icon" src='https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/tag.png'></image>
 						{{ item.sTimeHour < 10 ? '0' + item.sTimeHour : item.sTimeHour }}:{{ item.sTimeMin < 10 ? '0' + item.sTimeMin : item.sTimeMin }}
 						-
 						{{ item.eTimeHour < 10 ? '0' + item.eTimeHour : item.eTimeHour }}:{{ item.eTimeMin < 10 ? '0' + item.eTimeMin : item.eTimeMin }}
 					</view>
 					<view class="job-mark">{{ item.mark }}</view>
-					<!-- <view class="check-icon" @tap="checkJob(item, index)"></view> -->
+					<!-- <view class="check-icon" @click="checkJob(item, index)"></view> -->
 					<view class="check-icon"></view>
 				</view>
 				<view v-show="activeTab === 2" class="job-list" v-for="(item, index) in localjobList" :key="item"
-					:class="{ 'selected': selectedJobIndexes.includes(index) }" @tap="checkJob(item, index)">
+					:class="{ 'selected': selectedJobIndexes.includes(index) }" @click="checkJob(item, index)">
 					<!-- <view class="job-row"> -->
 					<view class="color-tip" :style="{ 'background-color': item.color }"></view>
 					<view class="job-date">
@@ -104,13 +104,13 @@
 						<!-- {{ selectKey }} -->
 					</view>
 					<view class="job-time">
-						<image class="tag-icon" src='../../static/icon/tag.png'></image>
+						<image class="tag-icon" src='https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/tag.png'></image>
 						{{ item.sTimeHour < 10 ? '0' + item.sTimeHour : item.sTimeHour }}:{{ item.sTimeMin < 10 ? '0' + item.sTimeMin : item.sTimeMin }}
 						-
 						{{ item.eTimeHour < 10 ? '0' + item.eTimeHour : item.eTimeHour }}:{{ item.eTimeMin < 10 ? '0' + item.eTimeMin : item.eTimeMin }}
 					</view>
 					<view class="job-mark">{{ item.mark }}</view>
-					<!-- <view class="uncheck-icon" v-show="!item.checked" @tap="checkJob(item, index)"></view> -->
+					<!-- <view class="uncheck-icon" v-show="!item.checked" @click="checkJob(item, index)"></view> -->
 					<view class="uncheck-icon"></view>
 
 					<!-- </view> -->
@@ -122,11 +122,11 @@
 		</view>
 		<!-- 任务删除-完成 -->
 		<view class="job-tools">
-			<view class="del" @tap="forSure()">
+			<view class="del" @click="forSure()">
 				<image class="del-icon"></image>
 				<text>删除</text>
 			</view>
-			<view class="finish" @tap="finishJob()">
+			<view class="finish" @click="finishJob()">
 				<image class="finish-icon"></image>
 				<text>完成</text>
 			</view>
@@ -148,8 +148,7 @@
 	</view>
 </template>
 
-<script>
-	// import TabSwitch from '@/pages/zui-calendar/components/zui-calendar/TabSwitch/TabSwitch.vue';
+<script>	
 	import saveJob from '@/pages/zui-calendar/savejob.js';
 	export default {
 		name: 'pxpDate',
@@ -422,7 +421,7 @@
 				}
 			},
 			updateJob(y, m, d, status) {
-				this.$refs.tabSwitchRef.getDayJob(y, m, d, status);
+				// this.$refs.tabSwitchRef.getDayJob(y, m, d, status);
 				// this.$refs.tabSwitchRef.switchTab(2)
 			},
 			printTodoList() {
@@ -821,7 +820,6 @@
 </script>
 
 <style lang="scss">
-	@import "iconfont.css";
 	@import url("./cal.css");
 
 	/* 取消顶部导航 */
@@ -878,7 +876,7 @@
 		}
 
 		.down-tip {
-			background-image: url('../../static/icon/down-tip.png');
+			background-image: url('https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/down-tip.png');
 			background-size: contain;
 			background-repeat: no-repeat;
 			width: 10px;
@@ -889,7 +887,7 @@
 		}
 
 		.select-all {
-			background-image: url('../../static/icon/check-all-dark.png');
+			background-image: url('https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/check-all-dark.png');
 			background-size: contain;
 			background-repeat: no-repeat;
 			width: 24px;
@@ -942,6 +940,37 @@
 						color: #b46274;
 						padding: 0 0rpx;
 					}
+				}
+				
+				.left-icon {
+					width: 13px;
+					height: 13px;
+					background-image: url('https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/left.png');
+					background-size: contain;
+					background-repeat: no-repeat;
+				}
+				.right-icon {
+					width: 13px;
+					height: 13px;
+					background-image: url('https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/right.png');
+					background-size: contain;
+					background-repeat: no-repeat;
+				}
+				
+				.up-icon {
+					width: 13px;
+					height: 13px;
+					background-image: url('https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/right.png');
+					background-size: contain;
+					background-repeat: no-repeat;
+				}
+				
+				.down-icon {
+					width: 13px;
+					height: 13px;
+					background-image: url('https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/right.png');
+					background-size: contain;
+					background-repeat: no-repeat;
 				}
 			}
 
@@ -1135,6 +1164,19 @@
 					right: 0;
 					transform: translateY(-50%);
 				}
+				.iconfont {
+				  display: flex;
+				  align-items: center;
+				  justify-content: center;
+				}
+				.icon-down {
+					width: 16px;
+					height: 16px;
+				}
+				.icon-up {
+					width: 16px;
+					height: 16px;
+				}
 			}
 		}
 
@@ -1170,7 +1212,7 @@
 	}
 
 	.btn-create {
-		background-image: url('../../static/icon/create.png');
+		background-image: url('https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/create.png');
 		background-size: contain;
 		background-repeat: no-repeat;
 		width: 55px;
@@ -1184,7 +1226,7 @@
 
 	.btn-debug {
 		display: none;
-		background-image: url('../../static/icon/delete.png');
+		background-image: url('https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/delete.png');
 		background-size: contain;
 		background-repeat: no-repeat;
 		width: 55px;
@@ -1222,7 +1264,7 @@
 		padding-left: 5px;
 		width: 25px;
 		height: 25px;
-		background-image: url('../../static/icon/delete.png');
+		background-image: url('https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/delete.png');
 		background-size: contain;
 		background-repeat: no-repeat;
 	}
@@ -1241,7 +1283,7 @@
 		padding-left: 5px;
 		width: 25px;
 		height: 25px;
-		background-image: url('../../static/icon/finished.png');
+		background-image: url('https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/finished.png');
 		background-size: contain;
 		background-repeat: no-repeat;
 	}
@@ -1323,7 +1365,7 @@
 	}
 
 	.uncheck-icon {
-		background-image: url('../../static/icon/uncheck-1.png');
+		background-image: url('https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/uncheck-1.png');
 		background-repeat: no-repeat;
 		background-size: cover;
 		position: absolute;
@@ -1334,7 +1376,7 @@
 	}
 
 	.check-icon {
-		background-image: url('../../static/icon/uncheck.png');
+		background-image: url('https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/uncheck.png');
 		background-repeat: no-repeat;
 		background-size: cover;
 		position: absolute;

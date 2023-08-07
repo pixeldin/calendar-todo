@@ -1,49 +1,50 @@
 @font-face {
-  font-family: "iconfont";
-  src: url('../../static/calendar/iconfont.woff2?t=1661934945336') format('woff2'),
-       url('../../static/calendar/iconfont.woff?t=1661934945336') format('woff'),
-       url('../../static/calendar/iconfont.ttf?t=1661934945336') format('truetype');
+	font-family: "iconfont";
+	src: url('../../static/calendar/iconfont.woff2?t=1661934945336') format('woff2'),
+		url('../../static/calendar/iconfont.woff?t=1661934945336') format('woff'),
+		url('../../static/calendar/iconfont.ttf?t=1661934945336') format('truetype');
 }
 
 .iconfont {
-  font-family: "iconfont" !important;
-  font-size: 32rpx;
-  font-style: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+	font-family: "iconfont" !important;
+	font-size: 32rpx;
+	font-style: normal;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 	color: #909193;
 }
 
 .icon-stretch:before {
-  content: "\eb0b";
+	content: "\eb0b";
 }
 
 .icon-merge:before {
-  content: "\e672";
+	content: "\e672";
 }
 
 .icon-dui:before {
-  content: "\e645";
+	content: "\e645";
 }
 
 .icon-cuo:before {
-  content: "\e646";
+	content: "\e646";
 }
 
 .icon-arrow-right:before {
-  content: "\e775";
+	content: "\e775";
 }
 
 .icon-arrow-left:before {
-  content: "\e779";
+	content: "\e779";
 }
 
 .icon-arrow-right2:before {
-  content: "\eb09";
+	content: "\eb09";
 }
 
 .icon-arrow-left2:before {
-  content: "\eb0a";
+	content: "\eb0a";
 }
-
-

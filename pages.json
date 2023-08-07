@@ -20,12 +20,6 @@
 				}
 			}
 		}, {
-			"path": "pages/zui-calendar/components/zui-calendar/TabSwitch/TabSwitch",
-			"style": {
-				"navigationBarTitleText": "",
-				"enablePullDownRefresh": false
-			}
-		}, {
 			"path": "pages/zui-calendar/components/zui-calendar/newItem/newItem",
 			"style": {
 				"navigationStyle": "custom",
