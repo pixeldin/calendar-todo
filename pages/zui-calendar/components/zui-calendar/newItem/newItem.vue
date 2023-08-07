@@ -78,15 +78,15 @@
 				<image class="tip-icon"></image>
 			</view>
 			<!-- Start 时间设置 -->
-			<view class="startAt">
+			<view class="startAt" @click="clickStart">
 				<text @click="clickStart" class="uni-datetime-picker-sign a-sign-left">起始</text>
 				<text class="uni-datetime-picker-sign ax-sign-left">{{ shour < 10 ? '0' + shour : shour }}</text>
 				<text class="uni-datetime-picker-sign a-sign-center">时</text>
 				<text class="uni-datetime-picker-sign ax-sign-center">{{ smin < 10 ? '0' + smin : smin }}</text>
 				<text class="uni-datetime-picker-sign a-sign-right">分</text>
 			</view>
-			<view class="endAt">
-				<text @click="clickEnd" class="uni-datetime-picker-sign e-sign-left">结束</text>
+			<view class="endAt" @click="clickEnd">
+				<text class="uni-datetime-picker-sign e-sign-left">结束</text>
 				<text class="uni-datetime-picker-sign ex-sign-left">{{ ehour < 10 ? '0' + ehour : ehour }}</text>
 				<text class="uni-datetime-picker-sign e-sign-center">时</text>
 				<text class="uni-datetime-picker-sign ex-sign-center">{{ emin < 10 ? '0' + emin : emin }}</text>
@@ -242,8 +242,13 @@
 			}
 		},
 		onLoad: function(option) {
-			this.selectDay = option.selectDay || '2023/8/1';
-			this.selectWeekDay = option.selectWeekDay || '二';
+			const Tyear = option.Tyear || 2023;
+			  const Tmonth = option.Tmonth || 8;
+			  const Tday = option.Tday || 1;
+			  this.selectDay = option.selectDay || `${Tyear}/${Tmonth}/${Tday}`;
+			  this.selectWeekDay = option.selectWeekDay || '二';
+			// this.selectDay = option.selectDay || '2023/8/1';
+			// this.selectWeekDay = option.selectWeekDay || '二';
 			// 接收来自上一页参数
 		},
 		watch: {
@@ -282,8 +287,8 @@
 		computed: {
 			btnBackground() {
 				return this.showIcon ?
-					'url(https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/btn-clicked.png)' :
-					'url(https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/btn-unclick.png)';
+					'url(https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/btn-clicked.png)' :
+					'url(https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/btn-unclick.png)';
 			},
 			hours() {
 				return this.getCurrentRange('hour')
@@ -546,6 +551,9 @@
 				console.log('起始时间:', this.shour, ':', this.smin,
 					' to ', this.ehour, ':', this.emin);
 
+				const dateString = this.selectDay;
+				const date = new Date(dateString);
+				const day = date.getDate();
 				// 传递当前数据过去
 				uni.navigateTo({
 					url: '/pages/zui-calendar/components/zui-calendar/zui-calendar?' +

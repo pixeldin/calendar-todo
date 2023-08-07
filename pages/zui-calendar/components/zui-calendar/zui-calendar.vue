@@ -46,16 +46,18 @@
 							:class="{ 'cTodayActive': item.day === day && item.today, 'actives': item.day === day, 'cToday': item.today }">
 							{{ item.today ? '今' : (item.day < 10 ? '0' + item.day : item.day) }}
 						</text>
-						<text class="day-dot" v-if="item.data.dot && item.data.active"></text>
-						<text class="day-dot dot-gray" v-if="item.data.dot && !item.data.active"></text>
+						<text class="day-dot" v-if="item.data.dot"
+							:style="{ backgroundColor: item.data.color }"></text>
 					</view>
 				</view>
 				<view style="width: 100%;" v-if="isShrink">
 					<view class="toggle" v-if="isOpen" @click="toStretch">
-						<image src="https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/down.png" class="icon-down"></image>
+						<image src="https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/down.png"
+							class="icon-down"></image>
 					</view>
 					<view class="toggle" v-else @click="toShrink">
-						<image src="https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/up.png" class="icon-up"></image>
+						<image src="https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/up.png"
+							class="icon-up"></image>
 					</view>
 				</view>
 			</view>
@@ -83,7 +85,9 @@
 						<view class="job-week">{{item.weekday}}</view>
 					</view>
 					<view class="job-time">
-						<image class="tag-icon" src='https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/tag.png'></image>
+						<image class="tag-icon"
+							src='https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/tag.png'>
+						</image>
 						{{ item.sTimeHour < 10 ? '0' + item.sTimeHour : item.sTimeHour }}:{{ item.sTimeMin < 10 ? '0' + item.sTimeMin : item.sTimeMin }}
 						-
 						{{ item.eTimeHour < 10 ? '0' + item.eTimeHour : item.eTimeHour }}:{{ item.eTimeMin < 10 ? '0' + item.eTimeMin : item.eTimeMin }}
@@ -104,7 +108,9 @@
 						<!-- {{ selectKey }} -->
 					</view>
 					<view class="job-time">
-						<image class="tag-icon" src='https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/tag.png'></image>
+						<image class="tag-icon"
+							src='https://mp-40dc0c3b-8c88-46a3-943c-80a76525110e.cdn.bspapp.com/todo-img/tag.png'>
+						</image>
 						{{ item.sTimeHour < 10 ? '0' + item.sTimeHour : item.sTimeHour }}:{{ item.sTimeMin < 10 ? '0' + item.sTimeMin : item.sTimeMin }}
 						-
 						{{ item.eTimeHour < 10 ? '0' + item.eTimeHour : item.eTimeHour }}:{{ item.eTimeMin < 10 ? '0' + item.eTimeMin : item.eTimeMin }}
@@ -148,7 +154,7 @@
 	</view>
 </template>
 
-<script>	
+<script>
 	import saveJob from '@/pages/zui-calendar/savejob.js';
 	export default {
 		name: 'pxpDate',
@@ -179,21 +185,27 @@
 				default: () => {
 					return [{
 						date: '2023-8-1',
-						value: '签到',
 						status: true,
 						dot: true,
+						color: 'FF9903',
 						active: true
 					}, {
 						date: '2023-8-5',
-						value: '未签到',
 						status: false,
 						dot: true,
+						color: '6488FF',
 						active: true
 					}, {
 						date: '2023-8-6',
-						value: '未打卡',
 						status: false,
 						dot: true,
+						color: '38B576',
+						active: true
+					}, {
+						date: '2023-8-8',
+						status: false,
+						dot: true,
+						color: '79BB31',
 						active: true
 					}] // {date: '2020-6-3', value: '签到', dot: true, active: true}
 				}
@@ -250,11 +262,6 @@
 		components: {},
 		onLoad: function(option) {
 			console.log('Pxp --------- onLoad from js---------', saveJob.jobList)
-
-			if (!option.newDay) {
-				console.log('--------- onLoad ---------')
-				return
-			}
 			// 接收来自上一页参数
 			const newDay = option.newDay;
 
@@ -274,28 +281,49 @@
 				eTimeMin: option.emin || '00',
 				mark: option.remark || '',
 				color: option.color || '2B89B8',
+				seDay: option.newDay,
 				finished: false,
 				uuid: Math.floor(Date.now() / 1000) // 时间戳作为唯一标识
 			};
 
 			this.updateTodoWithDate(todo, newDay);
 
-			// 将todo对象添加到对应日期的数组中
-			this.todoList[newDay].push(todo);
-			saveJob.updateJobList(this.todoList)
-			/*
-				toActive(item, index) {
-					this.day = item.day
-					console.log('toActive item/index, this.day', item, index, this.day)
-					this.clickActive(this.year, this.month, item.day, this.year + '-' + this.month + '-' + this.day, index)
-				}
-			*/
-			const dateStr = newDay;
-			const date = new Date(dateStr);
-			const sday = date.getDate();
-			// 光标聚焦
-			console.log('光标聚焦 debug======== this.day / sday', this.day, sday)
-			this.clickActive(this.year, this.month, sday, this.year + '-' + this.month + '-' + sday, sday)
+			if (!todo.seDay) {
+				// option.selectDay 为空的处理逻辑
+				console.log("Pxp============ option.selectDay 为空");
+				//  跳到今天
+				this.clickActive(this.Ayear, this.Amonth, this.Aday, this.Ayear + '-' + this.Amonth + '-' + this.Aday,
+					this.Aday)
+				this.switchTab(1)
+			} else {
+				// option.selectDay 不为空的处理逻辑
+				console.log("Pxp============ option.selectDay 不为空: ", todo.seDay);
+				const dateArr = todo.seDay.split('/');
+
+				const year = parseInt(dateArr[0]); // 获取年份
+				const month = parseInt(dateArr[1]); // 获取月份
+				const day = parseInt(dateArr[2]); // 获取日期
+				// 将todo对象添加到对应日期的数组中
+				this.todoList[newDay].push(todo);
+				saveJob.updateJobList(this.todoList)
+				var dayStr = year + '-' + month + '-' + day
+				this.updateDot(dayStr, todo.color)
+				this.day = day
+				console.log('光标聚焦 debug========', this.extraData, month, day, dayStr, day)
+				this.clickActive(year, month, day, dayStr, day)
+				this.switchTab(2)
+			}
+
+
+
+			// const dateStr = newDay;
+			// const date = new Date(dateStr);
+			// const sday = date.getDate();
+			// // 光标聚焦
+			// console.log('光标聚焦 debug======== this.day / sday', this.day, sday)
+			// this.clickActive(this.year, this.month, this.day, this.year + '-' + this.month + '-' + sday, sday)
+
+
 		},
 		created() {
 			this.isOpen = this.isUnfold
@@ -311,6 +339,29 @@
 			this.initApi(this.year, this.month)
 		},
 		methods: {
+			// 更新日期点标
+			updateDot(date, color) {
+				console.log('updateDot ============', date, color)
+				const matchedObj = this.extraData.find(obj => obj.date === date);
+				if (matchedObj) {
+					matchedObj.status = true;
+					matchedObj.color = color;
+				} else {
+					const newObj = {
+						date: date,
+						dot: true,
+						color: color,
+						status: true,
+						active: false
+					};
+					this.extraData.push(newObj);
+				}
+				// console.log('extraData ---------------- ', this.extraData)
+				// 再次刷新日历
+				this.dayList = this.getTime(this.Tyear, this.Tmonth)
+				// this.initTime(this.Tyear, this.Tmonth)
+				console.log('extraData ---------------- dayList', this.extraData, this.dayList)
+			},
 			showModal() {
 				this.showDialog = true;
 			},
@@ -593,11 +644,21 @@
 						today: false,
 						data
 					}
+
+					// 查找最近的任务颜色打点
+					if (obj.data && obj.data.date) {
+						let date = data.date.replace(/-/g, '/');
+						let colorArray = saveJob.jobList[date].map(item => item.color);
+						let maxColor = colorArray.reduce((a, b) => a > b ? a : b);
+						obj.data.color = maxColor;
+					}
+
 					if (tflag && i === this.Aday) {
 						// console.log("Pxp reset Today!")
 						// console.log("Pxp 当前 Tyear/Tmonth/Tday", this.Ayear, this.Amonth, this.Aday)
 						obj.today = true;
 					}
+					console.log('createDayList ===============', obj)
 					list.push(obj)
 				}
 				// for(let i = 0; i < week; i++){
@@ -741,6 +802,8 @@
 			},
 
 			toActive(item, index) {
+				// 清空选择框
+				this.clickCancelSelect()
 				this.day = item.day
 				// console.log('toActive item/index, this.day', item, index, this.day)
 				this.clickActive(this.year, this.month, item.day, this.year + '-' + this.month + '-' + this.day, index)
@@ -941,7 +1004,7 @@
 						padding: 0 0rpx;
 					}
 				}
-				
+
 				.left-icon {
 					width: 13px;
 					height: 13px;
@@ -949,6 +1012,7 @@
 					background-size: contain;
 					background-repeat: no-repeat;
 				}
+
 				.right-icon {
 					width: 13px;
 					height: 13px;
@@ -956,7 +1020,7 @@
 					background-size: contain;
 					background-repeat: no-repeat;
 				}
-				
+
 				.up-icon {
 					width: 13px;
 					height: 13px;
@@ -964,7 +1028,7 @@
 					background-size: contain;
 					background-repeat: no-repeat;
 				}
-				
+
 				.down-icon {
 					width: 13px;
 					height: 13px;
@@ -1164,15 +1228,18 @@
 					right: 0;
 					transform: translateY(-50%);
 				}
+
 				.iconfont {
-				  display: flex;
-				  align-items: center;
-				  justify-content: center;
+					display: flex;
+					align-items: center;
+					justify-content: center;
 				}
+
 				.icon-down {
 					width: 16px;
 					height: 16px;
 				}
+
 				.icon-up {
 					width: 16px;
 					height: 16px;
