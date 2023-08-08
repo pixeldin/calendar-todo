@@ -94,7 +94,7 @@
 					</view>
 					<view class="job-mark">{{ item.mark }}</view>
 					<!-- <view class="check-icon" @click="checkJob(item, index)"></view> -->
-					<view class="check-icon"></view>
+					<!-- <view class="check-icon"></view> -->
 				</view>
 				<view v-show="activeTab === 2" class="job-list" v-for="(item, index) in localjobList" :key="item"
 					:class="{ 'selected': selectedJobIndexes.includes(index) }" @click="checkJob(item, index)">
